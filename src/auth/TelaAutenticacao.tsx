@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { Aviso, Botao, Campo, Cartao, Motivo } from '../visual/componentes'
 
 /**
  * Cadastro e login por e-mail.
  *
- * Sem estilo de propósito: o sistema visual é a Etapa 1. O que precisa estar
- * certo aqui é o comportamento — erro visível, botão que não deixa clicar
- * duas vezes, e o aviso de confirmação de e-mail quando o projeto exige.
+ * O botão fica desabilitado durante o envio: sem isso, toque duplo em conexão
+ * lenta dispara duas tentativas de cadastro.
  */
 export function TelaAutenticacao() {
   const [modo, setModo] = useState<'entrar' | 'cadastrar'>('entrar')
@@ -38,54 +38,56 @@ export function TelaAutenticacao() {
   }
 
   return (
-    <main style={{ maxWidth: 360, margin: '3rem auto', padding: '0 1rem' }}>
-      <h1>Plantaly</h1>
+    <main className="entrada">
+      <div className="entrada__marca">
+        <Motivo contexto="cabecalho" desenho="flor" />
+        <h1>Plantaly</h1>
+        <p className="entrada__lema">Suas plantas, na hora certa.</p>
+      </div>
 
-      <form onSubmit={aoEnviar}>
-        <label style={{ display: 'block', marginBottom: '0.75rem' }}>
-          E-mail
-          <input
+      <Cartao elevado>
+        <form className="entrada__form" onSubmit={aoEnviar}>
+          <Campo
+            rotulo="E-mail"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            style={{ display: 'block', width: '100%' }}
+            inputMode="email"
+            spellCheck={false}
           />
-        </label>
 
-        <label style={{ display: 'block', marginBottom: '0.75rem' }}>
-          Senha
-          <input
+          <Campo
+            rotulo="Senha"
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             required
             minLength={8}
             autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'}
-            style={{ display: 'block', width: '100%' }}
+            ajuda={modo === 'cadastrar' ? 'Ao menos 8 caracteres.' : undefined}
           />
-        </label>
 
-        <button type="submit" disabled={enviando}>
-          {enviando ? 'Aguarde...' : modo === 'entrar' ? 'Entrar' : 'Criar conta'}
-        </button>
-      </form>
+          {erro && <Aviso tom="erro">{erro}</Aviso>}
+          {aviso && <Aviso tom="informacao">{aviso}</Aviso>}
 
-      {erro && <p role="alert">{erro}</p>}
-      {aviso && <p role="status">{aviso}</p>}
+          <Botao type="submit" largo disabled={enviando}>
+            {enviando ? 'Aguarde…' : modo === 'entrar' ? 'Entrar' : 'Criar conta'}
+          </Botao>
+        </form>
+      </Cartao>
 
-      <button
-        type="button"
+      <Botao
+        variante="discreto"
         onClick={() => {
           setModo(modo === 'entrar' ? 'cadastrar' : 'entrar')
           setErro(null)
           setAviso(null)
         }}
-        style={{ marginTop: '1rem' }}
       >
-        {modo === 'entrar' ? 'Ainda nao tenho conta' : 'Ja tenho conta'}
-      </button>
+        {modo === 'entrar' ? 'Ainda não tenho conta' : 'Já tenho conta'}
+      </Botao>
     </main>
   )
 }

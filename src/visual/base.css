@@ -1,0 +1,91 @@
+/* Base do Plantaly. Mobile-first: nada aqui assume tela larga. */
+
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Impede o iOS de aumentar a fonte ao girar o aparelho. */
+  -webkit-text-size-adjust: 100%;
+  /* Tema claro declarado: sem isso o Safari em modo escuro pinta os campos
+     nativos com o esquema dele e briga com a paleta. */
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--superficie-fundo);
+  color: var(--texto-principal);
+  font-family: var(--fonte);
+  font-size: var(--texto-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--texto-xl);
+}
+h2 {
+  font-size: var(--texto-lg);
+}
+
+p {
+  margin: 0;
+}
+
+/* Foco visível em tudo que recebe foco. Um anel que só aparece no teclado
+   deixa o app inutilizável para quem navega sem toque. */
+:focus-visible {
+  outline: 2px solid var(--primaria-base);
+  outline-offset: 2px;
+  border-radius: var(--raio-sm);
+}
+
+button,
+a {
+  /* Remove o atraso de 300ms do duplo-toque e o realce cinza padrão do
+     iOS, que aparecia por cima das nossas cores ao tocar. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Respeita quem pediu menos movimento no sistema. As animações da Etapa 1
+   são decorativas; nenhuma carrega informação que se perca ao desligar. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Só para leitor de tela. */
+.apenas-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

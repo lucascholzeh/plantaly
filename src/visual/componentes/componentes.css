@@ -1,0 +1,227 @@
+/* Componentes base do Plantaly. */
+
+/* ---------------------------------------------------------------- botão */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-sm);
+  /* 44px: alvo mínimo de toque da Apple. Abaixo disso erra-se o botão. */
+  min-height: 44px;
+  padding: 0 var(--espaco-lg);
+  border: 1px solid transparent;
+  border-radius: var(--raio-completo);
+  font-size: var(--texto-md);
+  font-weight: 600;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+}
+
+.botao:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.botao--primario {
+  background: var(--primaria-base);
+  color: var(--texto-sobre-primaria);
+}
+.botao--primario:hover:not(:disabled) {
+  background: var(--primaria-escura);
+}
+
+.botao--secundario {
+  background: var(--superficie-elevada);
+  color: var(--primaria-base);
+  border-color: var(--superficie-borda-controle);
+}
+.botao--secundario:hover:not(:disabled) {
+  background: var(--primaria-tint);
+}
+
+.botao--discreto {
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 0 var(--espaco-md);
+}
+.botao--discreto:hover:not(:disabled) {
+  background: var(--primaria-tint);
+  color: var(--primaria-escura);
+}
+
+.botao--largo {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------- cartão */
+
+.cartao {
+  position: relative;
+  background: var(--superficie-cartao);
+  border: 1px solid var(--superficie-borda);
+  border-radius: var(--raio-md);
+  padding: var(--espaco-md);
+  box-shadow: var(--sombra-cartao);
+}
+
+.cartao--elevado {
+  background: var(--superficie-elevada);
+  border-color: var(--superficie-borda-forte);
+  box-shadow: var(--sombra-elevada);
+}
+
+/* ---------------------------------------------------------------- campo */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xs);
+}
+
+.campo__rotulo {
+  font-size: var(--texto-sm);
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.campo__controle {
+  min-height: 44px;
+  padding: 0 var(--espaco-md);
+  background: var(--superficie-elevada);
+  color: var(--texto-principal);
+  border: 1px solid var(--superficie-borda-controle);
+  border-radius: var(--raio-sm);
+  font: inherit;
+  /* 16px evita o zoom automático do Safari no iPhone ao focar o campo. */
+  font-size: 16px;
+  width: 100%;
+}
+
+.campo__controle:disabled {
+  background: var(--superficie-fundo);
+  color: var(--texto-suave);
+}
+
+.campo__ajuda {
+  font-size: var(--texto-xs);
+  color: var(--texto-suave);
+}
+
+.campo__erro {
+  font-size: var(--texto-xs);
+  color: var(--estado-atrasada-forte);
+  font-weight: 600;
+}
+
+.campo--invalido .campo__controle {
+  border-color: var(--estado-atrasada-forte);
+  border-width: 2px;
+}
+
+/* Seletor: mesma moldura do campo, com a seta desenhada por nós. */
+.campo__controle--seletor {
+  appearance: none;
+  padding-right: var(--espaco-xl);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--texto-suave) 50%),
+    linear-gradient(135deg, var(--texto-suave) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% + 2px),
+    calc(100% - 12px) calc(50% + 2px);
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* -------------------------------------------------------------- etiqueta */
+
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xs);
+  padding: 2px var(--espaco-sm);
+  border-radius: var(--raio-completo);
+  font-size: var(--texto-xs);
+  font-weight: 700;
+}
+
+.etiqueta__icone {
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------- aviso */
+
+.aviso {
+  display: flex;
+  gap: var(--espaco-sm);
+  padding: var(--espaco-md);
+  border-radius: var(--raio-md);
+  border-left: 4px solid;
+  font-size: var(--texto-sm);
+}
+
+/* --------------------------------------------------------- estado vazio */
+
+.estado-vazio {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-sm);
+  padding: var(--espaco-xl) var(--espaco-lg);
+  text-align: center;
+  overflow: hidden;
+}
+
+.estado-vazio__titulo {
+  font-weight: 700;
+  color: var(--texto-principal);
+}
+
+.estado-vazio__texto {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+  max-width: 28ch;
+}
+
+/* ------------------------------------------------------------- motivos */
+
+.motivo {
+  position: absolute;
+  pointer-events: none;
+  color: var(--flor-violeta);
+}
+
+/* Opacidades por contexto. A regra da seção 9 mora aqui: decoração discreta
+   em todo lugar, e só a floração — o momento de comemoração — respira. */
+.motivo--estado-vazio {
+  opacity: 0.18;
+  inset: auto auto -12px -18px;
+  width: 96px;
+}
+
+.motivo--cabecalho {
+  opacity: 0.14;
+  inset: -10px -12px auto auto;
+  width: 72px;
+}
+
+.motivo--cartao-especie {
+  opacity: 0.16;
+  inset: auto -8px -8px auto;
+  width: 56px;
+}
+
+.motivo--floracao {
+  opacity: 0.55;
+  position: static;
+  width: 40px;
+}

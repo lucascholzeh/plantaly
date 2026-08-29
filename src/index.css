@@ -1,9 +1,0 @@
-/* Provisório: o sistema visual entra na Etapa 1 (seção 9 do design). */
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  line-height: 1.5;
-}

@@ -1,0 +1,83 @@
+/**
+ * Tokens visuais do Plantaly.
+ *
+ * Espelha src/visual/tokens.ts. Os dois arquivos são verificados por
+ * `tokens.test.ts`: mudar um sem o outro quebra a suíte.
+ *
+ * Tema escuro fica fora do v1 (seção 9), mas tudo já é token justamente
+ * para que acrescentá-lo depois não exija reescrever componente nenhum.
+ */
+
+:root {
+  /* superfícies ------------------------------------------------------ */
+  --superficie-fundo: #e9efe4;
+  --superficie-cartao: #f9fbf7;
+  --superficie-elevada: #ffffff;
+  --superficie-borda: #d3dfcb;
+  --superficie-borda-forte: #b4c6a9;
+  --superficie-borda-controle: #5f7d57;
+
+  /* texto ------------------------------------------------------------ */
+  --texto-principal: #1b3822;
+  --texto-suave: #42624c;
+  --texto-sobre-primaria: #ffffff;
+
+  /* primária --------------------------------------------------------- */
+  --primaria-base: #356b41;
+  --primaria-escura: #27512f;
+  --primaria-tint: #ddead8;
+
+  /* estados ---------------------------------------------------------- */
+  --estado-em-dia-forte: #356b41;
+  --estado-em-dia-tint: #ddead8;
+  --estado-hoje-forte: #6e5200;
+  --estado-hoje-tint: #faefcb;
+  --estado-atrasada-forte: #a8442f;
+  --estado-atrasada-tint: #fae4de;
+  --estado-atencao-forte: #5c2a0b;
+  --estado-atencao-tint: #efd8c0;
+  --estado-floracao-forte: #6f4394;
+  --estado-floracao-tint: #efe5f6;
+
+  /* acentos florais decorativos -------------------------------------- */
+  --flor-orquidea: #c4658f;
+  --flor-gerbera: #dcae38;
+  --flor-violeta: #957bc0;
+  --flor-coral: #d4826c;
+
+  /* espaçamento ------------------------------------------------------ */
+  --espaco-xs: 0.25rem;
+  --espaco-sm: 0.5rem;
+  --espaco-md: 1rem;
+  --espaco-lg: 1.5rem;
+  --espaco-xl: 2rem;
+
+  /* raios ------------------------------------------------------------ */
+  --raio-sm: 0.375rem;
+  --raio-md: 0.75rem;
+  --raio-lg: 1.25rem;
+  --raio-completo: 999px;
+
+  /* sombras: verde-acinzentado, nunca preto puro --------------------- */
+  --sombra-cartao: 0 1px 2px rgb(27 56 34 / 6%);
+  --sombra-elevada: 0 2px 8px rgb(27 56 34 / 10%);
+
+  /* tipografia ------------------------------------------------------- */
+  /* Pilha do sistema: no iPhone dos dois usuários isso é a San Francisco.
+     Custo zero de rede, nenhum salto de layout ao carregar, e funciona
+     offline sem esforço — o que importa num PWA. Fonte própria continua
+     possível depois; é troca de uma linha. */
+  --fonte:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', sans-serif;
+  --texto-xs: 0.75rem;
+  --texto-sm: 0.875rem;
+  --texto-md: 1rem;
+  --texto-lg: 1.25rem;
+  --texto-xl: 1.75rem;
+  /* Número de dias: é o dado lido de relance (seção 9). */
+  --texto-numero: 2.25rem;
+
+  /* barra inferior: altura + área segura do iPhone ------------------- */
+  --altura-barra: 3.5rem;
+  --area-segura-inferior: env(safe-area-inset-bottom, 0px);
+}

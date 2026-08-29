@@ -1,0 +1,144 @@
+/* Esqueleto do app: cabeçalho, conteúdo e barra inferior. */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__cabecalho {
+  position: relative;
+  overflow: hidden;
+  padding: var(--espaco-lg) var(--espaco-md) var(--espaco-md);
+  background: var(--superficie-cartao);
+  border-bottom: 1px solid var(--superficie-borda);
+}
+
+.app__conteudo {
+  flex: 1;
+  padding: var(--espaco-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+  /* Espaço para a barra não cobrir o último item da lista. */
+  padding-bottom: calc(var(--altura-barra) + var(--area-segura-inferior) + var(--espaco-lg));
+}
+
+/* Em tela larga o app não estica: continua uma coluna de app de celular. */
+@media (min-width: 640px) {
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    border-inline: 1px solid var(--superficie-borda);
+  }
+}
+
+/* ------------------------------------------------------- barra inferior */
+
+.barra {
+  position: fixed;
+  inset: auto 0 0 0;
+  display: flex;
+  background: var(--superficie-elevada);
+  border-top: 1px solid var(--superficie-borda);
+  padding-bottom: var(--area-segura-inferior);
+  z-index: 10;
+}
+
+@media (min-width: 640px) {
+  .barra {
+    max-width: 480px;
+    margin: 0 auto;
+    border-inline: 1px solid var(--superficie-borda);
+  }
+}
+
+.barra__item {
+  /* Sem isso o marcador da aba ativa se posiciona contra a barra inteira
+     e vaza para fora do item. */
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--altura-barra);
+  padding: var(--espaco-xs) 0;
+  border: none;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: var(--texto-xs);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.barra__item[aria-current='page'] {
+  color: var(--primaria-base);
+}
+
+.barra__icone {
+  width: 22px;
+  height: 22px;
+}
+
+/* Indicador da aba ativa: some para quem pediu menos movimento, mas a cor
+   e o aria-current continuam dizendo qual é. */
+.barra__marca {
+  position: absolute;
+  top: 0;
+  inset-inline: 30%;
+  height: 2px;
+  background: var(--primaria-base);
+  border-radius: var(--raio-completo);
+}
+
+/* ------------------------------------------------------- tela de entrada */
+
+.entrada {
+  min-height: 100dvh;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: var(--espaco-xl) var(--espaco-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-lg);
+}
+
+.entrada__marca {
+  position: relative;
+  padding: var(--espaco-md) var(--espaco-xl);
+  text-align: center;
+}
+
+.entrada__lema {
+  color: var(--texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.entrada__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.entrada .cartao {
+  width: 100%;
+}
+
+/* O motivo da marca fica ACIMA do título, nunca atrás: a seção 9 proíbe
+   decoração atrás de texto, e ao lado ele lia como acidente. */
+.entrada__marca {
+  padding-top: 3.25rem;
+}
+
+.entrada__marca .motivo {
+  inset: 0 auto auto 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  opacity: 0.5;
+  color: var(--flor-orquidea);
+}

@@ -9,9 +9,13 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapa 0 (fundação) em andamento** na branch `chore/fundacao`. Etapas 1 a 8 não iniciadas.
+**Etapa 0 (fundação)** e **Etapa 1 (sistema visual)** feitas. Branches `chore/fundacao` e `feat/sistema-visual`. Etapas 2 a 8 não iniciadas.
 
-Pronto: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail (sem estilo — o visual é a Etapa 1), migrações em `supabase/migrations/` e o teste de isolamento em `testes/isolamento.test.ts`.
+Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
+
+Etapa 1: paleta em `src/visual/tokens.ts` + `tokens.css` (duas cópias, com teste de paridade), componentes base em `src/visual/componentes/`, barra de quatro abas em `src/navegacao/`, telas vazias em `src/telas/`. 76 testes de contraste, separação de superfícies e paridade.
+
+**Galeria do sistema visual:** `npm run dev` e abrir `#/galeria` — só em desenvolvimento. Mostra todos os componentes e todos os estados juntos.
 
 **Confirmado em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 habilitados no Supabase. O agendamento da Etapa 7 é viável como desenhado.
 

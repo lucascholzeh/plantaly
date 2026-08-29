@@ -225,3 +225,82 @@
   position: static;
   width: 40px;
 }
+
+/* -------------------------------------------------------------- espécie */
+
+.especie__link {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-md);
+  text-decoration: none;
+  color: inherit;
+}
+
+.especie__foto,
+.especie__sem-foto {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border-radius: var(--raio-md);
+  object-fit: cover;
+  background: var(--primaria-tint);
+}
+
+.especie__nomes {
+  display: flex;
+  flex-direction: column;
+  /* Sem isso o nome longo empurra a foto e estoura a largura da tela. */
+  min-width: 0;
+}
+
+.especie__popular {
+  font-weight: 700;
+}
+
+.especie__cientifico {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+  font-style: italic;
+}
+
+.especie__figura {
+  margin: var(--espaco-md) 0 0;
+}
+
+.especie__figura img {
+  width: 100%;
+  border-radius: var(--raio-md);
+  display: block;
+}
+
+.especie__figura figcaption {
+  font-size: var(--texto-xs);
+  color: var(--texto-suave);
+  padding-top: var(--espaco-xs);
+}
+
+.especie__cadastrar {
+  margin-top: var(--espaco-md);
+}
+
+.marcadores {
+  margin: 0;
+  padding-left: var(--espaco-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xs);
+}
+
+.marcadores li {
+  /* Texto longo de identificação quebra em vez de vazar. */
+  overflow-wrap: break-word;
+}
+
+.creditos {
+  font-size: var(--texto-xs);
+  color: var(--texto-suave);
+}
+
+.creditos li {
+  margin-bottom: var(--espaco-xs);
+}

@@ -7,6 +7,7 @@ import { abaDaRota, useRota, voltar, type Rota } from './navegacao/rotas'
 import { CadastrarPlanta } from './telas/CadastrarPlanta'
 import { Calendario } from './telas/Calendario'
 import { Especies } from './telas/Especies'
+import { FichaEspecie } from './telas/FichaEspecie'
 import { FichaPlanta } from './telas/FichaPlanta'
 import { Hoje } from './telas/Hoje'
 import { MinhasPlantas } from './telas/MinhasPlantas'
@@ -27,13 +28,14 @@ const TELAS_DE_ABA = {
  */
 function tituloDe(rota: Rota): string | null {
   if (rota.tipo === 'nova-planta') return 'Nova planta'
-  if (rota.tipo === 'planta') return null
+  if (rota.tipo === 'planta' || rota.tipo === 'especie') return null
   return TITULOS[rota.aba]
 }
 
 function conteudoDe(rota: Rota) {
-  if (rota.tipo === 'nova-planta') return <CadastrarPlanta />
+  if (rota.tipo === 'nova-planta') return <CadastrarPlanta especieInicial={rota.especie} />
   if (rota.tipo === 'planta') return <FichaPlanta id={rota.id} />
+  if (rota.tipo === 'especie') return <FichaEspecie slug={rota.slug} />
   const Tela = TELAS_DE_ABA[rota.aba]
   return <Tela />
 }
@@ -41,6 +43,7 @@ function conteudoDe(rota: Rota) {
 /** Chave da animação: trocar de planta também precisa animar. */
 function chaveDe(rota: Rota): string {
   if (rota.tipo === 'planta') return `planta-${rota.id}`
+  if (rota.tipo === 'especie') return `especie-${rota.slug}`
   if (rota.tipo === 'nova-planta') return 'nova-planta'
   return rota.aba
 }

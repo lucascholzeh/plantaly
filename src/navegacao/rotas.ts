@@ -10,15 +10,27 @@ import { ABAS, type Aba } from './abas'
  * sim vale trocar.
  */
 export type Rota =
-  { tipo: 'aba'; aba: Aba } | { tipo: 'nova-planta' } | { tipo: 'planta'; id: string }
+  | { tipo: 'aba'; aba: Aba }
+  | { tipo: 'nova-planta'; especie?: string }
+  | { tipo: 'planta'; id: string }
+  | { tipo: 'especie'; slug: string }
 
 export function rotaDaUrl(hash: string = window.location.hash): Rota {
   const caminho = hash.replace(/^#\/?/, '')
 
-  if (caminho === 'plantas/nova') return { tipo: 'nova-planta' }
+  // `plantas/nova?especie=phalaenopsis` — a espécie escolhida no catálogo
+  // viaja pelo endereço, então o botão "Tenho essa planta" é um link comum.
+  const nova = /^plantas\/nova(?:\?(.*))?$/.exec(caminho)
+  if (nova) {
+    const especie = new URLSearchParams(nova[1] ?? '').get('especie')
+    return especie ? { tipo: 'nova-planta', especie } : { tipo: 'nova-planta' }
+  }
 
   const planta = /^plantas\/(.+)$/.exec(caminho)
   if (planta) return { tipo: 'planta', id: planta[1] }
+
+  const especie = /^especies\/(.+)$/.exec(caminho)
+  if (especie) return { tipo: 'especie', slug: especie[1] }
 
   return {
     tipo: 'aba',
@@ -28,7 +40,8 @@ export function rotaDaUrl(hash: string = window.location.hash): Rota {
 
 /** A aba que deve aparecer marcada na barra, para qualquer rota. */
 export function abaDaRota(rota: Rota): Aba {
-  return rota.tipo === 'aba' ? rota.aba : 'plantas'
+  if (rota.tipo === 'aba') return rota.aba
+  return rota.tipo === 'especie' ? 'especies' : 'plantas'
 }
 
 export function irPara(destino: string): void {

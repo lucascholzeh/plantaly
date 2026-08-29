@@ -9,7 +9,7 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0 a 3 feitas.** O app já é usável: dá para cadastrar planta, registrar rega e ver a próxima data. Etapas 4 a 8 não iniciadas. Próxima: Etapa 4 (catálogo de espécies).
+**Etapas 0 a 3 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies. Etapas 5 a 8 não iniciadas.
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 
@@ -22,6 +22,12 @@ Etapa 3: view `plant_status` no banco, camada de dados em `src/dados/`, telas re
 **Ao mexer no cálculo:** a regra de "quem está atrasado" vive em dois lugares — a view `plant_status` (que o agendador da Etapa 7 vai consultar) e `src/dominio/rega.ts` (que a tela usa). **A view é a verdade.** `testes/paridade.test.ts` roda os mesmos dados nos dois caminhos e falha se discordarem; mudar um lado sem o outro quebra a suíte de propósito.
 
 **Ao criar view nova:** sempre `with (security_invoker = true)`. Sem isso a view roda com os privilégios do dono e ignora o RLS de quem consulta.
+
+Etapa 4 (em ondas): catálogo em `src/catalogo/`, com validação de integridade na build. 6 espécies na onda 1 — phalaenopsis, lírio-da-paz, violeta-africana, kalanchoe, echeveria, antúrio.
+
+**Ao acrescentar espécie:** consulte a fonte de verdade antes de escrever qualquer número, e preencha `fontes` com a URL. Se a faixa de dias for tradução sua de um critério qualitativo (o caso normal — as fontes dizem "quando secar", não "a cada 8 dias"), marque `numerosDerivados: true`.
+
+**Ao acrescentar foto:** `node scripts/buscar-fotos.mjs "<termo>" <prefixo>` baixa candidatas para `fotos-triagem/`. **Abra cada imagem antes de aceitar.** A busca do Wikimedia devolve arquivos cujo texto menciona a espécie, incluindo livro digitalizado — uma candidata a "violeta africana" era a capa de um catálogo de sementes de 1897. Espécie sem foto conferida precisa preencher `semFotoAinda` dizendo por quê.
 
 **Galeria do sistema visual:** `npm run dev` e abrir `#/galeria` — só em desenvolvimento. Mostra todos os componentes e todos os estados juntos.
 

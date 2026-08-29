@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { ESPECIES, buscarEspecie, valoresParaCadastro } from '../catalogo'
 import { criarPlanta } from '../dados/plantas'
 import { ROTULOS_AMBIENTE } from '../dominio/ambiente'
 import { hoje as hojeDe } from '../dominio/datas'
@@ -20,13 +21,36 @@ const TOLERANCIAS: Record<ToleranciaSeca, string> = {
  * com valores de partida e um aviso de que são chute do usuário — melhor
  * dizer isso do que fingir precisão.
  */
-export function CadastrarPlanta() {
+export function CadastrarPlanta({ especieInicial }: { especieInicial?: string }) {
+  const doCatalogo = especieInicial ? buscarEspecie(especieInicial) : null
+  const partida = doCatalogo ? valoresParaCadastro(doCatalogo) : null
+
   const [apelido, setApelido] = useState('')
-  const [especie, setEspecie] = useState('')
+  const [slugEspecie, setSlugEspecie] = useState(doCatalogo?.slug ?? '')
+  const [especie, setEspecie] = useState(doCatalogo?.nomePopular ?? '')
   const [ambiente, setAmbiente] = useState<Ambiente>('janela_clara')
-  const [intervaloQuente, setIntervaloQuente] = useState(8)
-  const [intervaloFrio, setIntervaloFrio] = useState(15)
-  const [tolerancia, setTolerancia] = useState<ToleranciaSeca>('media')
+  const [intervaloQuente, setIntervaloQuente] = useState(partida?.intervaloQuente ?? 8)
+  const [intervaloFrio, setIntervaloFrio] = useState(partida?.intervaloFrio ?? 15)
+  const [tolerancia, setTolerancia] = useState<ToleranciaSeca>(partida?.toleranciaSeca ?? 'media')
+
+  /**
+   * Escolher a espécie preenche os intervalos e a tolerância.
+   *
+   * O catálogo é fonte de sugestão, não verdade em tempo real (decisão
+   * estrutural 1 do design): os valores são copiados aqui, uma vez, e a
+   * partir daí são da planta — editáveis logo abaixo, na mesma tela.
+   */
+  function escolherEspecie(slug: string) {
+    setSlugEspecie(slug)
+    const escolhida = buscarEspecie(slug)
+    if (!escolhida) return
+
+    setEspecie(escolhida.nomePopular)
+    const valores = valoresParaCadastro(escolhida)
+    setIntervaloQuente(valores.intervaloQuente)
+    setIntervaloFrio(valores.intervaloFrio)
+    setTolerancia(valores.toleranciaSeca)
+  }
   const [sabeUltimaRega, setSabeUltimaRega] = useState(false)
   const [ultimaRega, setUltimaRega] = useState(hojeDe('America/Sao_Paulo'))
   const [salvando, setSalvando] = useState(false)
@@ -67,12 +91,28 @@ export function CadastrarPlanta() {
             ajuda="Como você chama essa planta em casa."
           />
 
-          <Campo
-            rotulo="Espécie"
-            value={especie}
-            onChange={(e) => setEspecie(e.target.value)}
-            ajuda="Se não souber, deixe em branco. O catálogo chega numa próxima etapa."
-          />
+          <Seletor
+            rotulo="Espécie do catálogo"
+            value={slugEspecie}
+            onChange={(e) => escolherEspecie(e.target.value)}
+            ajuda="Preenche os intervalos e a tolerância sozinho. Dá para ajustar tudo abaixo."
+          >
+            <option value="">Não está na lista</option>
+            {ESPECIES.map((item) => (
+              <option key={item.slug} value={item.slug}>
+                {item.nomePopular}
+              </option>
+            ))}
+          </Seletor>
+
+          {slugEspecie === '' && (
+            <Campo
+              rotulo="Nome da espécie"
+              value={especie}
+              onChange={(e) => setEspecie(e.target.value)}
+              ajuda="Se não souber, deixe em branco. O catálogo cresce em ondas."
+            />
+          )}
 
           <Seletor
             rotulo="Ambiente"
@@ -92,8 +132,10 @@ export function CadastrarPlanta() {
       <Cartao elevado>
         <div className="formulario__campos">
           <p className="formulario__nota">
-            Quase tudo rega menos no inverno — por isso são dois números. Ainda dá para mudar
-            depois, e o app vai sugerir ajustes conforme perceber o seu ritmo.
+            {slugEspecie
+              ? 'Vindos do catálogo e já ajustáveis. Quase tudo rega menos no inverno — por isso são dois números.'
+              : 'Quase tudo rega menos no inverno — por isso são dois números.'}{' '}
+            O app vai sugerir ajustes conforme perceber o seu ritmo.
           </p>
 
           <Campo

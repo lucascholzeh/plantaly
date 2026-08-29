@@ -9,7 +9,7 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0, 1 e 2 feitas** (fundação, sistema visual, regras de cálculo). Etapas 3 a 8 não iniciadas. Próxima: Etapa 3 (núcleo — cadastro de plantas, registro de rega, aba "Hoje", ficha).
+**Etapas 0 a 3 feitas.** O app já é usável: dá para cadastrar planta, registrar rega e ver a próxima data. Etapas 4 a 8 não iniciadas. Próxima: Etapa 4 (catálogo de espécies).
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 
@@ -17,7 +17,11 @@ Etapa 1: paleta em `src/visual/tokens.ts` + `tokens.css` (duas cópias, com test
 
 Etapa 2: regras de cálculo em `src/dominio/`, todas funções puras, sem banco nem tela — datas em dia local, estação, ambiente, estado da rega, gravidade do atraso, supressão de adubação e aprendizado por histórico. 74 testes.
 
-**Ao mexer no cálculo:** `src/dominio/` é a verdade do app sobre "quem está atrasado". A view do banco da Etapa 3 replica essa regra e precisa do teste de paridade entre as duas — é o risco nomeado na seção 13 do design.
+Etapa 3: view `plant_status` no banco, camada de dados em `src/dados/`, telas reais em `src/telas/` e rotas de ficha e cadastro. 15 testes de paridade.
+
+**Ao mexer no cálculo:** a regra de "quem está atrasado" vive em dois lugares — a view `plant_status` (que o agendador da Etapa 7 vai consultar) e `src/dominio/rega.ts` (que a tela usa). **A view é a verdade.** `testes/paridade.test.ts` roda os mesmos dados nos dois caminhos e falha se discordarem; mudar um lado sem o outro quebra a suíte de propósito.
+
+**Ao criar view nova:** sempre `with (security_invoker = true)`. Sem isso a view roda com os privilégios do dono e ignora o RLS de quem consulta.
 
 **Galeria do sistema visual:** `npm run dev` e abrir `#/galeria` — só em desenvolvimento. Mostra todos os componentes e todos os estados juntos.
 

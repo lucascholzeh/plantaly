@@ -85,7 +85,7 @@ export function FichaPlanta({ id }: { id: string }) {
       {falha && <Aviso tom="erro">Não salvei: {falha}</Aviso>}
 
       <Cartao elevado>
-        <h2>{p.nickname}</h2>
+        <h1>{p.nickname}</h1>
         {p.species_label && <p className="planta__especie">{p.species_label}</p>}
 
         <div className="ficha__estado">

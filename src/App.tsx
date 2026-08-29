@@ -19,9 +19,15 @@ const TELAS_DE_ABA = {
   especies: Especies,
 }
 
-function tituloDe(rota: Rota): string {
+/**
+ * Título do cabeçalho.
+ *
+ * Nulo na ficha de planta: quem sabe o nome é a tela, que carregou a
+ * planta. Um "Planta" genérico aqui só duplicaria o apelido logo abaixo.
+ */
+function tituloDe(rota: Rota): string | null {
   if (rota.tipo === 'nova-planta') return 'Nova planta'
-  if (rota.tipo === 'planta') return 'Planta'
+  if (rota.tipo === 'planta') return null
   return TITULOS[rota.aba]
 }
 
@@ -47,6 +53,7 @@ export default function App() {
   if (!sessao) return <TelaAutenticacao />
 
   const interna = rota.tipo !== 'aba'
+  const titulo = tituloDe(rota)
 
   return (
     <div className="app">
@@ -58,7 +65,7 @@ export default function App() {
             ← Voltar
           </button>
         )}
-        <h1>{tituloDe(rota)}</h1>
+        {titulo && <h1>{titulo}</h1>}
       </header>
 
       <main className="app__conteudo">

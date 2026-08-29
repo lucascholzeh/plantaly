@@ -39,12 +39,20 @@ Etapa 4 (em ondas): catálogo em `src/catalogo/`, com validação de integridade
 
 **Banco aplicado em 2026-08-29.** Migrações rodadas, confirmação de e-mail desligada, contas de teste criadas. `npm test` passa: 89 testes, sendo 13 de isolamento entre contas.
 
+## Publicação
+
+- **App:** Vercel, em `https://plantaly.vercel.app`. A URL longa com hash é específica de um deploy e fica atrás do login do Vercel — a de produção é a curta.
+- **Build no Vercel precisa das três variáveis `VITE_*`.** Sem elas o bundle sai sem a URL do Supabase e o app mostra tela branca: o cliente lança erro antes de montar. Conferir com `curl -s https://plantaly.vercel.app/assets/index-*.js | grep -c supabase.co` — zero significa build sem variáveis.
+- **Segredos da Edge Function** (`VAPID_PRIVATE_KEY`, `SEGREDO_AGENDADOR`) nunca vão para o Vercel. Só para o Supabase, via `npm run segredos`.
+
 ## Comandos
 
 - `npm run verificar` — lint + formatação + tipos + testes. É o portão de cada etapa.
 - `npm run dev` — servidor local; `#/galeria` mostra o sistema visual.
 - `npm run contas:teste` — recria as contas de teste no `.env` (se o banco for resetado).
-- `npm run migracoes:juntar` — gera `supabase/aplicar-tudo.sql` para colar no SQL Editor.
+- `npm run migracoes:juntar [0006]` — gera `supabase/aplicar-tudo.sql` para colar no SQL Editor; o argumento inclui só da migração indicada em diante.
+- `npm run segredos` — envia os segredos da Edge Function, lendo do `.env`.
+- `npm run icones` — regera os ícones do PWA a partir do SVG.
 
 ## Restrições que não dá para inferir do código
 

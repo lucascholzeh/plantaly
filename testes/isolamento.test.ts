@@ -135,6 +135,20 @@ describe('isolamento entre contas (RLS)', () => {
       expect(data!.some((linha) => linha.user_id === usuarioA)).toBe(false)
     })
 
+    it('a conta B nao enxerga a planta de A na view de status', async () => {
+      // A view precisa ter sido criada com `security_invoker = true`. Sem
+      // isso ela roda com os privilegios do dono e ignora o RLS de quem
+      // consulta — entregando as plantas de uma conta para a outra.
+      const { data, error } = await clienteB.from('plant_status').select('plant_id')
+      expect(error).toBeNull()
+      expect(data!.some((linha) => linha.plant_id === plantaDeA)).toBe(false)
+    })
+
+    it('sem autenticacao a view de status nao devolve nada', async () => {
+      const { data } = await clienteAnonimo.from('plant_status').select('plant_id')
+      expect(data ?? []).toEqual([])
+    })
+
     it('buscar a planta de A pelo id exato tambem devolve vazio para B', async () => {
       const { data } = await clienteB.from('plants').select('id').eq('id', plantaDeA)
       expect(data).toEqual([])

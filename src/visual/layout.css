@@ -142,3 +142,182 @@
   opacity: 0.5;
   color: var(--flor-orquidea);
 }
+
+/* ----------------------------------------------- listas e itens de tela */
+
+.app__tela {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.app__voltar {
+  border: none;
+  background: transparent;
+  padding: 0 0 var(--espaco-xs);
+  color: var(--primaria-base);
+  font-size: var(--texto-sm);
+  font-weight: 600;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+}
+
+.lista__titulo {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--espaco-sm);
+}
+
+.item__nome,
+.planta__nome {
+  color: var(--texto-principal);
+  font-weight: 700;
+  text-decoration: none;
+  /* Apelido longo trunca em vez de empurrar o botão para fora da tela. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item__nome:hover,
+.planta__nome:hover {
+  text-decoration: underline;
+}
+
+.item .etiqueta {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.item .botao {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.planta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xs);
+  align-items: flex-start;
+}
+
+.planta__especie,
+.planta__rega {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--espaco-sm);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.acoes--espalhadas {
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.acoes .campo {
+  flex: 1;
+  min-width: 8rem;
+}
+
+/* ----------------------------------------------------------- formulário */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.formulario__campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.formulario__nota {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}
+
+.marcador {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-sm);
+  font-size: var(--texto-sm);
+  font-weight: 600;
+  /* Rótulo e caixa num alvo de toque só, sem zona morta entre eles. */
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.marcador input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primaria-base);
+}
+
+/* --------------------------------------------------------------- ficha */
+
+.ficha__estado {
+  margin: var(--espaco-sm) 0;
+}
+
+.ficha__dados {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+  margin: 0 0 var(--espaco-md);
+}
+
+.ficha__dados dt {
+  font-size: var(--texto-xs);
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.ficha__dados dd {
+  margin: 0;
+}
+
+.historico {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+}
+
+.historico li {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--espaco-md);
+  border-left: 2px solid var(--superficie-borda-forte);
+}
+
+.historico__tipo {
+  font-weight: 700;
+  font-size: var(--texto-sm);
+}
+
+.historico__data,
+.historico__nota {
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}

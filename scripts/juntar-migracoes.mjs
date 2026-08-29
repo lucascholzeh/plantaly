@@ -13,12 +13,18 @@ const PASTA = 'supabase/migrations'
 const SAIDA = 'supabase/aplicar-tudo.sql'
 const REGUA = '='.repeat(60)
 
+// Argumento opcional: prefixo a partir do qual incluir. `0004` gera só da
+// quarta migração em diante — necessário num banco que já foi migrado, onde
+// recolar as anteriores daria erro de objeto já existente.
+const desde = process.argv[2]
+
 const arquivos = readdirSync(PASTA)
   .filter((nome) => nome.endsWith('.sql'))
   .sort()
+  .filter((nome) => !desde || nome >= desde)
 
 if (arquivos.length === 0) {
-  console.error(`Nenhuma migração encontrada em ${PASTA}`)
+  console.error(`Nenhuma migração encontrada em ${PASTA}${desde ? ` a partir de ${desde}` : ''}`)
   process.exit(1)
 }
 

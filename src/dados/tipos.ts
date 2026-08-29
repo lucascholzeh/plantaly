@@ -18,6 +18,8 @@ export interface PlantaLinha {
   fertilize_interval_warm: number | null
   fertilize_interval_cold: number | null
   drought_tolerance: ToleranciaSeca
+  /** Última sugestão do aprendizado que o usuário dispensou. */
+  rejected_interval: number | null
   archived_at: string | null
   created_at: string
 }

@@ -9,7 +9,9 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0 a 3 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies. Etapas 5 a 8 não iniciadas.
+**Etapas 0 a 3 e 5 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. Etapas 6 a 8 não iniciadas — próxima é a 6 (PWA instalável).
+
+**Pendente:** aplicar a migração `0005_intervalo_recusado.sql` no Supabase. Sem ela o bloco de aprendizado quebra ao recusar uma sugestão.
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 

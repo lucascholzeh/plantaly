@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BlocoAdubacao } from './BlocoAdubacao'
+import { BlocoAprendizado } from './BlocoAprendizado'
 import { BlocoFloracao } from './BlocoFloracao'
 import { BlocoRecuperacao } from './BlocoRecuperacao'
 import { historicoDaPlanta, registrarEvento } from '../dados/eventos'
@@ -131,6 +132,8 @@ export function FichaPlanta({ id }: { id: string }) {
           {salvando ? 'Salvando…' : 'Reguei hoje'}
         </Botao>
       </Cartao>
+
+      <BlocoAprendizado planta={p} status={status} aoMudar={recarregarTudo} />
 
       {status.situacao_rega === 'atencao' && (
         <BlocoRecuperacao diasDeAtraso={status.dias_de_atraso_rega} especieSlug={p.species_slug} />

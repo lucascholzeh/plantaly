@@ -105,6 +105,7 @@ export type CamposEditaveis = Partial<
     | 'water_interval_cold'
     | 'fertilize_interval_warm'
     | 'fertilize_interval_cold'
+    | 'rejected_interval'
   >
 >
 

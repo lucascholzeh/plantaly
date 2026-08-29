@@ -454,3 +454,12 @@
   color: var(--texto-suave);
   padding-top: var(--espaco-sm);
 }
+
+/* ------------------------------------------------------------ aprendizado */
+
+.aprendizado {
+  border-left: 4px solid var(--primaria-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+}

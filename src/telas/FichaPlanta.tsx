@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BlocoAdubacao } from './BlocoAdubacao'
 import { BlocoRecuperacao } from './BlocoRecuperacao'
 import { historicoDaPlanta, registrarEvento } from '../dados/eventos'
 import { arquivarPlanta, buscarPlanta, excluirPlanta } from '../dados/plantas'
@@ -154,6 +155,8 @@ export function FichaPlanta({ id }: { id: string }) {
           </Botao>
         </div>
       </Cartao>
+
+      <BlocoAdubacao planta={p} status={status} aoMudar={recarregarTudo} />
 
       <Cartao>
         <h2 className="lista__titulo">Histórico</h2>

@@ -11,6 +11,7 @@ import { detalheDoAtraso } from './textos'
 interface Desfazivel {
   eventoId: string
   planta: string
+  tipo: 'Rega' | 'Adubação'
 }
 
 /**
@@ -33,7 +34,7 @@ export function Hoje() {
     setOcupada(item.planta.id)
     try {
       const eventoId = await registrarEvento(item.planta.id, 'rega', item.status.hoje)
-      setDesfazivel({ eventoId, planta: item.planta.nickname })
+      setDesfazivel({ eventoId, planta: item.planta.nickname, tipo: 'Rega' })
       recarregar()
     } catch (e) {
       // Registro otimista com falha visível: o app diz que não salvou em
@@ -60,6 +61,20 @@ export function Hoje() {
       setOcupada(null)
     }
     await gravarRega(item)
+  }
+
+  async function aoAdubar(item: PlantaComStatus) {
+    setFalha(null)
+    setOcupada(item.planta.id)
+    try {
+      const eventoId = await registrarEvento(item.planta.id, 'adubacao', item.status.hoje)
+      setDesfazivel({ eventoId, planta: item.planta.nickname, tipo: 'Adubação' })
+      recarregar()
+    } catch (e) {
+      setFalha(e instanceof Error ? e.message : String(e))
+    } finally {
+      setOcupada(null)
+    }
   }
 
   async function desfazer() {
@@ -101,6 +116,15 @@ export function Hoje() {
   const por = (situacao: string) => plantas.filter((p) => p.status.situacao_rega === situacao)
 
   const precisamDeVoce = [...por('atencao'), ...por('atrasada'), ...por('vence-hoje')]
+
+  // Adubação entra numa seção própria e só quando a rega está em dia: a
+  // regra cruzada da seção 6 proíbe sugerir adubo para planta com sede.
+  const adubacaoPendente = plantas.filter(
+    (p) =>
+      (p.status.situacao_adubacao === 'atrasada' || p.status.situacao_adubacao === 'vence-hoje') &&
+      p.status.situacao_rega !== 'atrasada' &&
+      p.status.situacao_rega !== 'atencao',
+  )
   const proximas = por('em-dia').sort((a, b) =>
     (a.status.proxima_rega ?? '').localeCompare(b.status.proxima_rega ?? ''),
   )
@@ -131,7 +155,9 @@ export function Hoje() {
       {desfazivel && (
         <Cartao elevado>
           <div className="acoes acoes--espalhadas">
-            <span>Rega registrada em {desfazivel.planta}.</span>
+            <span>
+              {desfazivel.tipo} registrada em {desfazivel.planta}.
+            </span>
             <Botao variante="discreto" onClick={desfazer}>
               Desfazer
             </Botao>
@@ -141,6 +167,20 @@ export function Hoje() {
 
       {precisamDeVoce.length === 0 && (
         <EstadoVazio titulo="Nada para hoje" texto="Todas as plantas estão em dia." />
+      )}
+
+      {adubacaoPendente.length > 0 && (
+        <section className="lista">
+          <h2 className="lista__titulo">Adubar</h2>
+          {adubacaoPendente.map((item) => (
+            <ItemDeAdubacao
+              key={item.planta.id}
+              item={item}
+              ocupado={ocupada === item.planta.id}
+              aoAdubar={() => aoAdubar(item)}
+            />
+          ))}
+        </section>
       )}
 
       {secoes.map(([titulo, itens]) =>
@@ -159,6 +199,42 @@ export function Hoje() {
         ),
       )}
     </>
+  )
+}
+
+/**
+ * Linha da seção de adubação.
+ *
+ * Componente separado do de rega de propósito: reaproveitar o item com o
+ * botão "Reguei" faria o toque registrar o evento errado.
+ */
+function ItemDeAdubacao({
+  item,
+  ocupado,
+  aoAdubar,
+}: {
+  item: PlantaComStatus
+  ocupado: boolean
+  aoAdubar: () => void
+}) {
+  const { planta, status } = item
+  return (
+    <Cartao className="item">
+      <a className="item__nome" href={`#/plantas/${planta.id}`}>
+        {planta.nickname}
+      </a>
+      <Etiqueta
+        estado={status.situacao_adubacao === 'atrasada' ? 'atrasada' : 'hoje'}
+        detalhe={
+          status.dias_de_atraso_adubacao > 0
+            ? `adubo há ${status.dias_de_atraso_adubacao} dias`
+            : 'adubo hoje'
+        }
+      />
+      <Botao variante="secundario" onClick={aoAdubar} disabled={ocupado}>
+        {ocupado ? 'Salvando…' : 'Adubei'}
+      </Botao>
+    </Cartao>
   )
 }
 

@@ -9,7 +9,7 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0 a 3 e 5 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. Etapas 6 a 8 não iniciadas — próxima é a 6 (PWA instalável).
+**Etapas 0 a 3, 5 e 6 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. Próxima: Etapa 7 (notificações push). A Etapa 8 (assistente) fica para depois, por decisão do Lucas.
 
 **Pendente:** aplicar a migração `0005_intervalo_recusado.sql` no Supabase. Sem ela o bloco de aprendizado quebra ao recusar uma sugestão.
 

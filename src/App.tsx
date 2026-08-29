@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { TelaAutenticacao } from './auth/TelaAutenticacao'
 import { useSessao } from './auth/useSessao'
 import { BarraNavegacao } from './navegacao/BarraNavegacao'
+import { ConviteInstalacao } from './pwa/ConviteInstalacao'
 import { TITULOS } from './navegacao/abas'
 import { abaDaRota, useRota, voltar, type Rota } from './navegacao/rotas'
 import { CadastrarPlanta } from './telas/CadastrarPlanta'
@@ -72,6 +73,10 @@ export default function App() {
       </header>
 
       <main className="app__conteudo">
+        {/* Só aparece no iPhone, fora da Tela de Início, e some por uma
+            semana quando dispensado. */}
+        <ConviteInstalacao />
+
         {/* `mode="wait"` evita as duas telas empilhadas durante a troca. */}
         <AnimatePresence mode="wait">
           <motion.div

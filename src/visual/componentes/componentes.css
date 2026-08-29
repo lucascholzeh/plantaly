@@ -463,3 +463,25 @@
   flex-direction: column;
   gap: var(--espaco-sm);
 }
+
+/* ------------------------------------------------- convite de instalação */
+
+.convite {
+  border-left: 4px solid var(--primaria-base);
+}
+
+.convite__passos {
+  margin: var(--espaco-sm) 0 var(--espaco-md);
+  padding-left: var(--espaco-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+  font-size: var(--texto-sm);
+}
+
+.convite__icone {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.2em;
+  color: var(--primaria-base);
+}

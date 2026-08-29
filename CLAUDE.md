@@ -9,9 +9,11 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-Etapas 0 a 8 **não iniciadas**. O repositório contém apenas os dois documentos. Nada de código ainda.
+Etapas 0 a 8 **não iniciadas**. O repositório contém apenas documentação. Nada de código ainda.
 
-Bloqueio da Etapa 0: confirmar `pg_cron` e `pg_net` no projeto Supabase, e obter URL + chave anônima.
+**Confirmado em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 disponíveis e **habilitados** no projeto Supabase. O agendamento da Etapa 7 está viável como desenhado — o risco correspondente da seção 15 do design está resolvido.
+
+**Falta para a Etapa 0 começar:** `.env` preenchido com URL e chave anônima do Supabase (ver `.env.example`).
 
 ## Restrições que não dá para inferir do código
 

@@ -391,7 +391,8 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 | Ponto | Observação |
 |---|---|
-| Limites do plano gratuito do Supabase | Pausa por inatividade e limites de `pg_cron` mudam com frequência. Confirmar na implementação; o cron diário deve manter o projeto ativo, mas isso precisa ser verificado, não assumido. |
+| ~~Disponibilidade de `pg_cron`~~ | **Resolvido em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 habilitados no projeto. O agendamento da seção 10 é viável como desenhado. |
+| Pausa do projeto por inatividade | Continua em aberto. O cron de hora em hora deve manter o projeto ativo, mas isso precisa ser observado no uso real, não assumido. Se o projeto pausar, o push silencia sem aviso — a aba "Hoje" é a mitigação. |
 | Push no iOS | A parte mais frágil do projeto. Inscrições podem morrer silenciosamente. Mitigado por não depender dele. |
 | Precisão das fotos do catálogo | Acervos abertos contêm identificações erradas. Fonte visível e sinalização de dúvida onde há sósia. |
 | Fator de ambiente | É heurística, não medição. Apresentado como sugestão editável; o aprendizado por histórico é quem converge para a verdade. |

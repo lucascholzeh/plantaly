@@ -353,3 +353,104 @@
 .floracao__lista strong {
   color: var(--estado-floracao-forte);
 }
+
+/* ------------------------------------------------------------ calendário */
+
+.mes {
+  overflow: hidden;
+}
+
+.mes__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-sm);
+}
+
+.mes__nome {
+  font-size: var(--texto-md);
+  text-transform: capitalize;
+}
+
+.mes__grade {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-top: var(--espaco-sm);
+}
+
+.mes__cabecalho {
+  text-align: center;
+  font-size: var(--texto-xs);
+  font-weight: 700;
+  color: var(--texto-suave);
+  padding-bottom: var(--espaco-xs);
+}
+
+.mes__dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  /* 44px de alvo de toque, exigência da Apple, também na grade. */
+  min-height: 44px;
+  padding: var(--espaco-xs) 0;
+  border: 1px solid transparent;
+  border-radius: var(--raio-sm);
+  background: transparent;
+  font-size: var(--texto-sm);
+  color: var(--texto-principal);
+}
+
+.mes__dia--hoje {
+  border-color: var(--primaria-base);
+  font-weight: 700;
+}
+
+.mes__dia--aberto {
+  background: var(--primaria-tint);
+}
+
+.mes__marcas {
+  display: flex;
+  gap: 2px;
+  min-height: 6px;
+}
+
+.marca {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Cheia é o que aconteceu; vazada é o previsto. A diferença é de forma,
+   não só de cor: quem não distingue matiz continua distinguindo as duas. */
+.marca--rega {
+  background: var(--primaria-base);
+}
+.marca--adubacao {
+  background: var(--estado-hoje-forte);
+}
+.marca--floracao {
+  background: var(--estado-floracao-forte);
+}
+.marca--replantio,
+.marca--nota {
+  background: var(--texto-suave);
+}
+
+.marca--prevista {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: var(--primaria-base);
+}
+.marca--prevista.marca--adubacao {
+  color: var(--estado-hoje-forte);
+}
+
+.mes__legenda {
+  font-size: var(--texto-xs);
+  color: var(--texto-suave);
+  padding-top: var(--espaco-sm);
+}

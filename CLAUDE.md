@@ -9,11 +9,19 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-Etapas 0 a 8 **não iniciadas**. O repositório contém apenas documentação. Nada de código ainda.
+**Etapa 0 (fundação) em andamento** na branch `chore/fundacao`. Etapas 1 a 8 não iniciadas.
 
-**Confirmado em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 disponíveis e **habilitados** no projeto Supabase. O agendamento da Etapa 7 está viável como desenhado — o risco correspondente da seção 15 do design está resolvido.
+Pronto: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail (sem estilo — o visual é a Etapa 1), migrações em `supabase/migrations/` e o teste de isolamento em `testes/isolamento.test.ts`.
 
-**Falta para a Etapa 0 começar:** `.env` preenchido com URL e chave anônima do Supabase (ver `.env.example`).
+**Confirmado em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 habilitados no Supabase. O agendamento da Etapa 7 é viável como desenhado.
+
+**Bloqueado, precisa do Lucas:**
+1. Aplicar as migrações no projeto Supabase (as três de `supabase/migrations/`).
+2. Criar duas contas de teste e preencher `TESTE_USUARIO_*` no `.env`.
+
+Até isso, `npm test` falha de propósito — o teste de isolamento não se cala em silêncio.
+
+Comando de verificação completo: `npm run verificar` (lint + formatação + tipos + testes).
 
 ## Restrições que não dá para inferir do código
 

@@ -3,8 +3,11 @@ node_modules/
 
 # Build
 dist/
+dist-ssr/
 build/
 .vite/
+coverage/
+*.local
 
 # Variáveis de ambiente — nunca versionar chaves do Supabase
 .env

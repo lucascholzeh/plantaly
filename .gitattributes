@@ -1,0 +1,13 @@
+# Quebra de linha LF no repositorio e tambem na copia de trabalho.
+#
+# `eol=lf` vence o core.autocrlf do Windows de proposito: sem isso o Git
+# entrega CRLF no disco, o Prettier (que espera LF) reprova todo arquivo,
+# e o `npm run verificar` falha por um motivo que nao tem nada a ver com
+# o codigo. Tambem silencia o aviso de conversao em cada commit.
+* text=auto eol=lf
+
+# Binarios nao passam por conversao nenhuma.
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary

@@ -260,7 +260,55 @@ Barra fixa inferior, quatro seções.
 
 ---
 
-## 9. Notificações
+## 9. Identidade visual
+
+**Direção:** cores leves inspiradas em folhagem e flores. Colorido, em tons claros — mas com separação suficiente entre eles para que superfícies e estados não se confundam. Detalhes florais sutis como decoração, sem virar ruído.
+
+### Paleta
+
+**Estrutura (verdes):** fundo em off-white levemente esverdeado (nunca branco puro), cards em branco quente, verde-folha médio como cor primária de ações e navegação ativa, verde profundo no lugar do preto para texto.
+
+**Acentos florais:** rosa-orquídea, amarelo-gérbera, lilás-violeta e coral/terracota. Cada um carrega significado — não são decoração aleatória:
+
+| Estado | Cor |
+|---|---|
+| Em dia | verde |
+| Vence hoje | amarelo-gérbera |
+| Atrasada | coral suave |
+| Atenção (recuperação) | terracota, mais saturado |
+| Floração | lilás-violeta |
+
+**Sem vermelho de alarme**, coerente com a decisão da seção 11: atraso se comunica sem dramatizar.
+
+### A regra contra o "tudo parecido"
+
+O risco de paleta clara é as superfícies se fundirem. A separação vem de três meios combinados, nunca de matiz sozinho:
+
+1. Diferença mínima garantida de luminosidade entre fundo, card e card elevado.
+2. Bordas de 1px em tom da própria cor da superfície, não cinza.
+3. O acento colorido carregando o estado, com peso visual suficiente para ser lido de relance.
+
+**Acessibilidade:** contraste mínimo AA para texto. Estado nunca comunicado só por cor — sempre cor + ícone + texto ("Atrasada há 3 dias"), o que também resolve leitura sob sol na varanda.
+
+### Detalhes florais
+
+Um único sistema de motivos: traço fino botânico (pétala, folha), em tinta da própria superfície, opacidade baixa.
+
+**Onde entram:** estados vazios (nenhuma planta cadastrada, mês sem registros), cabeçalho das seções, canto do card de espécie no catálogo, e o registro de floração — o único lugar onde pode ser mais expressivo, porque é o momento de comemoração do app.
+
+**Onde não entram:** nas linhas de ação da aba "Hoje" (tela funcional de dez segundos), atrás de qualquer texto, e na ficha de planta em estado de atenção — não se decora um problema.
+
+**Contenção:** no máximo um elemento decorativo por região visível, e nunca dois motivos diferentes na mesma tela. É essa regra que separa "decorado" de "bagunçado".
+
+### Outras decisões
+
+**Tipografia:** uma família só, com variação de peso. O número de dias é o dado lido de relance e recebe destaque de tamanho.
+
+**Tema escuro:** fora do v1, mas as cores entram como tokens desde o primeiro commit para não exigir reescrita depois.
+
+---
+
+## 10. Notificações
 
 ### Cadastro no iPhone
 
@@ -290,7 +338,7 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 ---
 
-## 10. Casos de borda
+## 11. Casos de borda
 
 | Caso | Comportamento |
 |---|---|
@@ -306,7 +354,7 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 ---
 
-## 11. Erros e falhas
+## 12. Erros e falhas
 
 - **Sem internet / sinal ruim:** o app abre com dados em cache (o service worker já existe por causa do push). Registro otimista: aparece feito na hora e é enviado em seguida; falhando, **o app informa que não salvou** em vez de fingir.
 - **Sessão expirada:** novo login, devolvendo o usuário ao ponto em que estava.
@@ -314,7 +362,7 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 ---
 
-## 12. Testes
+## 13. Testes
 
 **Peso principal no cálculo de datas**, que é lógica pura e barata de testar: sazonalidade, virada de estação no meio do ciclo, ambiente, registro retroativo, planta sem histórico, fuso horário, gatilho da sugestão de ajuste, limiar de gravidade do atraso.
 
@@ -328,7 +376,7 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 ---
 
-## 13. Fases de implementação
+## 14. Fases de implementação
 
 1. **Fundação** — projeto, banco, RLS e o teste de isolamento.
 2. **Núcleo** — cadastro de plantas, registro de rega, cálculo de próxima rega com sazonalidade e ambiente, aba "Hoje", ficha da planta.
@@ -339,7 +387,7 @@ Inscrição morta (ícone apagado, troca de aparelho) é removida pelo servidor;
 
 ---
 
-## 14. Riscos e pontos a verificar
+## 15. Riscos e pontos a verificar
 
 | Ponto | Observação |
 |---|---|

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BlocoRecuperacao } from './BlocoRecuperacao'
 import { historicoDaPlanta, registrarEvento } from '../dados/eventos'
 import { arquivarPlanta, buscarPlanta, excluirPlanta } from '../dados/plantas'
 import { useCarregamento } from '../dados/useCarregamento'
@@ -128,6 +129,10 @@ export function FichaPlanta({ id }: { id: string }) {
           {salvando ? 'Salvando…' : 'Reguei hoje'}
         </Botao>
       </Cartao>
+
+      {status.situacao_rega === 'atencao' && (
+        <BlocoRecuperacao diasDeAtraso={status.dias_de_atraso_rega} especieSlug={p.species_slug} />
+      )}
 
       <Cartao>
         <h2 className="lista__titulo">Registrar rega de outro dia</h2>

@@ -304,3 +304,28 @@
 .creditos li {
   margin-bottom: var(--espaco-xs);
 }
+
+/* --------------------------------------------------------- recuperação */
+
+/* Sem motivo floral: a seção 9 proíbe decorar um problema. */
+.recuperacao {
+  border-left: 4px solid var(--estado-atencao-forte);
+}
+
+.recuperacao__especifico {
+  font-size: var(--texto-sm);
+  padding: var(--espaco-sm) 0;
+}
+
+.recuperacao__passos {
+  margin: var(--espaco-sm) 0 0;
+  padding-left: var(--espaco-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+  font-size: var(--texto-sm);
+}
+
+.recuperacao__passos strong {
+  color: var(--estado-atencao-forte);
+}

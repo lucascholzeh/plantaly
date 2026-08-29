@@ -1,0 +1,26 @@
+# Dependências
+node_modules/
+
+# Build
+dist/
+build/
+.vite/
+
+# Variáveis de ambiente — nunca versionar chaves do Supabase
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.temp/
+supabase/.branches/
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

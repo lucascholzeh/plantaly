@@ -17,6 +17,10 @@ coverage/
 # Supabase local
 supabase/.temp/
 supabase/.branches/
+# Arquivo de conveniencia gerado a partir das migracoes numeradas.
+# Nao versionado de proposito: versionado, envelheceria e alguem colaria
+# uma versao desatualizada. Regerar com `npm run migracoes:juntar`.
+supabase/aplicar-tudo.sql
 
 # Editores e sistema operacional
 .vscode/

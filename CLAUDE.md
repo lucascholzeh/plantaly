@@ -9,11 +9,15 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapa 0 (fundação)** e **Etapa 1 (sistema visual)** feitas. Branches `chore/fundacao` e `feat/sistema-visual`. Etapas 2 a 8 não iniciadas.
+**Etapas 0, 1 e 2 feitas** (fundação, sistema visual, regras de cálculo). Etapas 3 a 8 não iniciadas. Próxima: Etapa 3 (núcleo — cadastro de plantas, registro de rega, aba "Hoje", ficha).
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 
 Etapa 1: paleta em `src/visual/tokens.ts` + `tokens.css` (duas cópias, com teste de paridade), componentes base em `src/visual/componentes/`, barra de quatro abas em `src/navegacao/`, telas vazias em `src/telas/`. 76 testes de contraste, separação de superfícies e paridade.
+
+Etapa 2: regras de cálculo em `src/dominio/`, todas funções puras, sem banco nem tela — datas em dia local, estação, ambiente, estado da rega, gravidade do atraso, supressão de adubação e aprendizado por histórico. 74 testes.
+
+**Ao mexer no cálculo:** `src/dominio/` é a verdade do app sobre "quem está atrasado". A view do banco da Etapa 3 replica essa regra e precisa do teste de paridade entre as duas — é o risco nomeado na seção 13 do design.
 
 **Galeria do sistema visual:** `npm run dev` e abrir `#/galeria` — só em desenvolvimento. Mostra todos os componentes e todos os estados juntos.
 

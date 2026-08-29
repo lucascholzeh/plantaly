@@ -15,7 +15,8 @@
     "verificar": "npm run lint && npm run format:check && tsc -b && npm run test",
     "migracoes:juntar": "node scripts/juntar-migracoes.mjs",
     "contas:teste": "node scripts/criar-contas-teste.mjs",
-    "icones": "node scripts/gerar-icones.mjs"
+    "icones": "node scripts/gerar-icones.mjs",
+    "segredos": "node scripts/enviar-segredos.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.0",

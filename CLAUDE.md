@@ -19,13 +19,14 @@ Etapa 1: paleta em `src/visual/tokens.ts` + `tokens.css` (duas cópias, com test
 
 **Confirmado em 2026-08-29:** `pg_cron` 1.6.4 e `pg_net` 0.20.4 habilitados no Supabase. O agendamento da Etapa 7 é viável como desenhado.
 
-**Bloqueado, precisa do Lucas:**
-1. Aplicar as migrações no projeto Supabase (as três de `supabase/migrations/`).
-2. Criar duas contas de teste e preencher `TESTE_USUARIO_*` no `.env`.
+**Banco aplicado em 2026-08-29.** Migrações rodadas, confirmação de e-mail desligada, contas de teste criadas. `npm test` passa: 89 testes, sendo 13 de isolamento entre contas.
 
-Até isso, `npm test` falha de propósito — o teste de isolamento não se cala em silêncio.
+## Comandos
 
-Comando de verificação completo: `npm run verificar` (lint + formatação + tipos + testes).
+- `npm run verificar` — lint + formatação + tipos + testes. É o portão de cada etapa.
+- `npm run dev` — servidor local; `#/galeria` mostra o sistema visual.
+- `npm run contas:teste` — recria as contas de teste no `.env` (se o banco for resetado).
+- `npm run migracoes:juntar` — gera `supabase/aplicar-tudo.sql` para colar no SQL Editor.
 
 ## Restrições que não dá para inferir do código
 

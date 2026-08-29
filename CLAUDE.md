@@ -23,6 +23,8 @@ Etapa 3: view `plant_status` no banco, camada de dados em `src/dados/`, telas re
 
 **Ao mexer no cálculo:** a regra de "quem está atrasado" vive em dois lugares — a view `plant_status` (que o agendador da Etapa 7 vai consultar) e `src/dominio/rega.ts` (que a tela usa). **A view é a verdade.** `testes/paridade.test.ts` roda os mesmos dados nos dois caminhos e falha se discordarem; mudar um lado sem o outro quebra a suíte de propósito.
 
+**Ao escrever migração:** ela precisa ser **reexecutável**. São coladas à mão no SQL Editor, que aborta no primeiro erro — sem `if not exists` (ou equivalente), uma migração já aplicada impede todas as seguintes de rodar no mesmo arquivo.
+
 **Ao criar view nova:** sempre `with (security_invoker = true)`. Sem isso a view roda com os privilégios do dono e ignora o RLS de quem consulta.
 
 Etapa 4 (em ondas): catálogo em `src/catalogo/`, com validação de integridade na build. 6 espécies na onda 1 — phalaenopsis, lírio-da-paz, violeta-africana, kalanchoe, echeveria, antúrio.

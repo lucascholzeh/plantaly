@@ -10,8 +10,37 @@
 -- O segredo fica no Vault, não no corpo do agendamento: `cron.job` é
 -- legível por quem tem acesso ao banco, e um segredo em texto plano ali
 -- teria a mesma força de nenhum segredo.
-select vault.create_secret('<SEGREDO>', 'plantaly_agendador', 'Autoriza o cron a chamar a função de lembretes');
+--
+-- Cria ou atualiza, para o arquivo poder ser rodado de novo sem erro.
+do $bloco$
+declare
+  -- ÚNICO lugar a editar neste arquivo.
+  segredo text := '<SEGREDO>';
+  id_existente uuid;
+begin
+  -- Compara o formato, não o texto: assim o guard sobrevive a um
+  -- "substituir tudo", que trocaria a própria comparação se ela citasse o
+  -- marcador literalmente.
+  if segredo like '<%>' or length(segredo) < 16 then
+    raise exception 'Cole o valor de SEGREDO_AGENDADOR (do .env) na linha do segredo antes de rodar.';
+  end if;
 
+  select id into id_existente from vault.secrets where name = 'plantaly_agendador';
+
+  if id_existente is null then
+    perform vault.create_secret(
+      segredo,
+      'plantaly_agendador',
+      'Autoriza o cron a chamar a função de lembretes'
+    );
+  else
+    perform vault.update_secret(id_existente, segredo);
+  end if;
+end
+$bloco$;
+
+-- `cron.schedule` com o mesmo nome substitui o agendamento anterior, então
+-- rodar de novo é seguro.
 select cron.schedule(
   'plantaly-lembretes',
   '0 * * * *',

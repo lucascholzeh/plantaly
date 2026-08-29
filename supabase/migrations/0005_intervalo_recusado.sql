@@ -5,8 +5,11 @@
 -- ficha proporia de novo o mesmo número, e a sugestão viraria ruído — que é
 -- o caminho mais curto para o usuário parar de ler qualquer aviso do app.
 
+-- `if not exists` porque as migracoes sao coladas a mao no SQL Editor, que
+-- aborta no primeiro erro: sem isso, uma migracao ja aplicada impede todas
+-- as seguintes de rodar.
 alter table public.plants
-  add column rejected_interval smallint
+  add column if not exists rejected_interval smallint
     check (rejected_interval is null or rejected_interval between 1 and 365);
 
 comment on column public.plants.rejected_interval is

@@ -321,3 +321,25 @@
   font-size: var(--texto-sm);
   color: var(--texto-suave);
 }
+
+.app__ajustes {
+  position: absolute;
+  top: var(--espaco-md);
+  right: var(--espaco-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 44px de alvo de toque mesmo o ícone sendo pequeno. */
+  width: 44px;
+  height: 44px;
+  color: var(--texto-suave);
+}
+
+.app__ajustes svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app__ajustes:hover {
+  color: var(--primaria-base);
+}

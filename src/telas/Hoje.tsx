@@ -5,6 +5,7 @@ import type { PlantaComStatus } from '../dados/tipos'
 import { useCarregamento } from '../dados/useCarregamento'
 import { irPara } from '../navegacao/rotas'
 import { Aviso, Botao, Cartao, EstadoVazio, Etiqueta } from '../visual/componentes'
+import { ConvitePush } from '../pwa/ConvitePush'
 import { estadoVisual } from './estados'
 import { detalheDoAtraso } from './textos'
 
@@ -138,6 +139,11 @@ export function Hoje() {
 
   return (
     <>
+      {/* Só aparece depois de haver planta cadastrada: pedir permissão numa
+          tela vazia é o caminho mais curto para um "Não permitir" que o iOS
+          não deixa reverter com facilidade. */}
+      <ConvitePush />
+
       {falha && <Aviso tom="erro">Não salvei: {falha}</Aviso>}
 
       {duplicada && (

@@ -7,6 +7,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
+      // `injectManifest` porque o service worker é escrito à mão: o modo
+      // gerado não permite acrescentar o tratamento de `push`, e sem ele a
+      // notificação chega ao aparelho mas não aparece na tela.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png', 'favicon.svg'],
       manifest: {
@@ -30,29 +36,8 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
-        runtimeCaching: [
-          {
-            // Dados do Supabase: rede primeiro, cache como rede de segurança.
-            // O contrário mostraria rega de ontem como se fosse de hoje — e a
-            // seção 12 exige que o app não finja.
-            urlPattern: /^https:\/\/[a-z0-9]+\.supabase\.co\/rest\/v1\//,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'dados-plantaly',
-              networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 7 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-          {
-            // Autenticação nunca é servida de cache: token vencido em cache
-            // produz sessão fantasma.
-            urlPattern: /^https:\/\/[a-z0-9]+\.supabase\.co\/auth\//,
-            handler: 'NetworkOnly',
-          },
-        ],
       },
       devOptions: { enabled: false },
     }),

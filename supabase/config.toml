@@ -1,0 +1,9 @@
+# Configuração do projeto Supabase.
+
+project_id = "plantaly"
+
+[functions.enviar-lembretes]
+# A função é chamada pelo pg_cron, que não tem sessão de usuário e portanto
+# não tem JWT para apresentar. A autorização é feita pelo cabeçalho
+# `x-agendador`, conferido dentro da própria função.
+verify_jwt = false

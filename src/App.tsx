@@ -5,6 +5,7 @@ import { BarraNavegacao } from './navegacao/BarraNavegacao'
 import { ConviteInstalacao } from './pwa/ConviteInstalacao'
 import { TITULOS } from './navegacao/abas'
 import { abaDaRota, useRota, voltar, type Rota } from './navegacao/rotas'
+import { Ajustes } from './telas/Ajustes'
 import { CadastrarPlanta } from './telas/CadastrarPlanta'
 import { Calendario } from './telas/Calendario'
 import { Especies } from './telas/Especies'
@@ -28,6 +29,7 @@ const TELAS_DE_ABA = {
  * planta. Um "Planta" genérico aqui só duplicaria o apelido logo abaixo.
  */
 function tituloDe(rota: Rota): string | null {
+  if (rota.tipo === 'ajustes') return null
   if (rota.tipo === 'nova-planta') return 'Nova planta'
   if (rota.tipo === 'planta' || rota.tipo === 'especie') return null
   return TITULOS[rota.aba]
@@ -37,6 +39,7 @@ function conteudoDe(rota: Rota) {
   if (rota.tipo === 'nova-planta') return <CadastrarPlanta especieInicial={rota.especie} />
   if (rota.tipo === 'planta') return <FichaPlanta id={rota.id} />
   if (rota.tipo === 'especie') return <FichaEspecie slug={rota.slug} />
+  if (rota.tipo === 'ajustes') return <Ajustes />
   const Tela = TELAS_DE_ABA[rota.aba]
   return <Tela />
 }
@@ -45,6 +48,7 @@ function conteudoDe(rota: Rota) {
 function chaveDe(rota: Rota): string {
   if (rota.tipo === 'planta') return `planta-${rota.id}`
   if (rota.tipo === 'especie') return `especie-${rota.slug}`
+  if (rota.tipo === 'ajustes') return 'ajustes'
   if (rota.tipo === 'nova-planta') return 'nova-planta'
   return rota.aba
 }
@@ -70,6 +74,23 @@ export default function App() {
           </button>
         )}
         {titulo && <h1>{titulo}</h1>}
+        {!interna && (
+          <a className="app__ajustes" href="#/ajustes" aria-label="Ajustes">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="3.2" />
+              <path
+                d="M12 3v2.2M12 18.8V21M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1"
+                strokeLinecap="round"
+              />
+            </svg>
+          </a>
+        )}
       </header>
 
       <main className="app__conteudo">

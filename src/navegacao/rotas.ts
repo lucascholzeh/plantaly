@@ -14,6 +14,7 @@ export type Rota =
   | { tipo: 'nova-planta'; especie?: string }
   | { tipo: 'planta'; id: string }
   | { tipo: 'especie'; slug: string }
+  | { tipo: 'ajustes' }
 
 export function rotaDaUrl(hash: string = window.location.hash): Rota {
   const caminho = hash.replace(/^#\/?/, '')
@@ -28,6 +29,8 @@ export function rotaDaUrl(hash: string = window.location.hash): Rota {
 
   const planta = /^plantas\/(.+)$/.exec(caminho)
   if (planta) return { tipo: 'planta', id: planta[1] }
+
+  if (caminho === 'ajustes') return { tipo: 'ajustes' }
 
   const especie = /^especies\/(.+)$/.exec(caminho)
   if (especie) return { tipo: 'especie', slug: especie[1] }

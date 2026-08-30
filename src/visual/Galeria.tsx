@@ -1,7 +1,17 @@
 import { useState } from 'react'
 import { BarraNavegacao } from '../navegacao/BarraNavegacao'
 import { type Aba } from '../navegacao/abas'
-import { Aviso, Botao, Campo, Cartao, EstadoVazio, Etiqueta, Motivo, Seletor } from './componentes'
+import {
+  Aviso,
+  Botao,
+  Campo,
+  Cartao,
+  EstadoVazio,
+  Etiqueta,
+  FotoDaPlanta,
+  Motivo,
+  Seletor,
+} from './componentes'
 import { estados } from './tokens'
 
 /**
@@ -52,6 +62,42 @@ export function Galeria() {
           <Cartao>
             <Etiqueta estado="atrasada" detalhe="há 3 dias" />{' '}
             <Etiqueta estado="atencao" detalhe="há 12 dias" />
+          </Cartao>
+        </Secao>
+
+        <Secao titulo="Balão da planta">
+          {/* Sem caminho, o balão cai na inicial do apelido — que é o estado
+              que a lista mostra enquanto ninguém fotografou nada. A foto real
+              exige sessão e Storage, e por isso não aparece aqui. */}
+          <Cartao className="planta">
+            <FotoDaPlanta caminho={null} apelido="Vitória" />
+            <div className="planta__texto">
+              <a className="planta__nome" href="#/galeria">
+                Vitória
+              </a>
+              <p className="planta__especie">Orquídea Phalaenopsis</p>
+              <p className="planta__rega">Regada há 6 dias</p>
+              <p className="planta__proxima">Regar amanhã</p>
+              <Etiqueta estado="emDia" />
+            </div>
+          </Cartao>
+
+          <Cartao className="item">
+            <FotoDaPlanta caminho={null} apelido="Zé" />
+            <a className="item__nome" href="#/galeria">
+              Zé
+            </a>
+            <Etiqueta estado="atrasada" detalhe="há 3 dias" />
+            <Botao>Reguei</Botao>
+          </Cartao>
+
+          <Cartao>
+            {/* Os dois tamanhos lado a lado: lista e ficha. */}
+            <div style={{ display: 'flex', gap: 'var(--espaco-md)', alignItems: 'center' }}>
+              <FotoDaPlanta caminho={null} apelido="Ângela" />
+              <FotoDaPlanta caminho={null} apelido="ângela" tamanho="ficha" />
+              <FotoDaPlanta caminho={null} apelido="🌵 cacto" tamanho="ficha" />
+            </div>
           </Cartao>
         </Secao>
 

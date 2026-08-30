@@ -65,6 +65,16 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Pular para o conteúdo. É um botão, não um link com `href="#..."`:
+          as rotas do app vivem no hash, e um href trocaria `#/calendario`
+          por `#conteudo` — jogando a pessoa de volta para a aba "Hoje". */}
+      <button
+        type="button"
+        className="app__pular"
+        onClick={() => document.getElementById('conteudo')?.focus()}
+      >
+        Pular para o conteúdo
+      </button>
       <header className="app__cabecalho">
         {/* Cabeçalho é um dos quatro lugares onde o motivo floral é permitido. */}
         <Motivo contexto="cabecalho" />
@@ -93,7 +103,7 @@ export default function App() {
         )}
       </header>
 
-      <main className="app__conteudo">
+      <main className="app__conteudo" id="conteudo" tabIndex={-1}>
         {/* Só aparece no iPhone, fora da Tela de Início, e some por uma
             semana quando dispensado. */}
         <ConviteInstalacao />

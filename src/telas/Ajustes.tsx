@@ -4,9 +4,13 @@ import { buscarPerfil, salvarPerfil } from '../dados/perfil'
 import { useCarregamento } from '../dados/useCarregamento'
 import { supabase } from '../lib/supabase'
 import { ativarPush, desativarPush, estadoDoPush, type EstadoDoPush } from '../pwa/push'
-import { Aviso, Botao, Cartao, Seletor } from '../visual/componentes'
+import { Aviso, Botao, Carregando, Cartao, Seletor } from '../visual/componentes'
 
 const HORAS = Array.from({ length: 24 }, (_, h) => h)
+
+/** Horário no formato do idioma, em vez de "00:00" escrito à mão. */
+const HORA = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
+const formatarHora = (h: number) => HORA.format(new Date(2026, 0, 1, h, 0))
 
 export function Ajustes() {
   const perfil = useCarregamento(buscarPerfil)
@@ -14,11 +18,19 @@ export function Ajustes() {
   const [push, setPush] = useState<EstadoDoPush | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+  const [salvo, setSalvo] = useState<string | null>(null)
+  const [confirmandoSaida, setConfirmandoSaida] = useState(false)
 
   useEffect(() => {
     estadoDoPush()
       .then(setPush)
-      .catch(() => setPush('indisponivel'))
+      .catch((e) => {
+        // Falha ao consultar não é o mesmo que navegador sem suporte. Dizer
+        // "não envia notificações" para um erro de rede mandava a pessoa
+        // desistir de algo que funciona.
+        setErro(e instanceof Error ? e.message : String(e))
+        setPush('sem-worker')
+      })
   }, [])
 
   const temPlanta = (plantas.dados?.length ?? 0) > 0
@@ -37,9 +49,13 @@ export function Ajustes() {
 
   async function mudarHora(hora: number) {
     setErro(null)
+    setSalvo(null)
     try {
       await salvarPerfil({ notification_hour: hora })
       perfil.recarregar()
+      // Sem confirmação a troca de horário era muda: nada na tela dizia se
+      // gravou. O aviso some na próxima troca.
+      setSalvo(`Lembrete movido para ${formatarHora(hora)}.`)
     } catch (e) {
       setErro(e instanceof Error ? e.message : String(e))
     }
@@ -59,7 +75,9 @@ export function Ajustes() {
       <Cartao>
         <h2 className="lista__titulo">Lembretes</h2>
 
-        {push === null && <p className="formulario__nota">Verificando…</p>}
+        {push === null && <Carregando>Verificando…</Carregando>}
+
+        {salvo && <Aviso tom="informacao">{salvo}</Aviso>}
 
         {push === 'indisponivel' && (
           <p className="formulario__nota">
@@ -78,6 +96,14 @@ export function Ajustes() {
         {push === 'sem-chave' && (
           <Aviso tom="atencao">
             As chaves de notificação não estão configuradas neste ambiente.
+          </Aviso>
+        )}
+
+        {push === 'sem-worker' && (
+          <Aviso tom="atencao">
+            Não consegui preparar as notificações agora. Feche o Plantaly por completo e abra de
+            novo pelo ícone da Tela de Início. Se continuar, os lembretes seguem desligados — a aba
+            “Hoje” mostra o que precisa de você.
           </Aviso>
         )}
 
@@ -117,7 +143,7 @@ export function Ajustes() {
             >
               {HORAS.map((h) => (
                 <option key={h} value={h}>
-                  {String(h).padStart(2, '0')}:00
+                  {formatarHora(h)}
                 </option>
               ))}
             </Seletor>
@@ -127,9 +153,24 @@ export function Ajustes() {
 
       <Cartao>
         <h2 className="lista__titulo">Conta</h2>
-        <Botao variante="secundario" onClick={() => supabase.auth.signOut()}>
-          Sair
-        </Botao>
+        {!confirmandoSaida ? (
+          <Botao variante="secundario" onClick={() => setConfirmandoSaida(true)}>
+            Sair
+          </Botao>
+        ) : (
+          <div className="formulario__campos">
+            <Aviso tom="atencao">
+              Você vai precisar do e-mail e da senha para entrar de novo. Suas plantas ficam
+              guardadas.
+            </Aviso>
+            <div className="acoes">
+              <Botao onClick={() => supabase.auth.signOut()}>Sair da conta</Botao>
+              <Botao variante="discreto" onClick={() => setConfirmandoSaida(false)}>
+                Cancelar
+              </Botao>
+            </div>
+          </div>
+        )}
       </Cartao>
     </>
   )

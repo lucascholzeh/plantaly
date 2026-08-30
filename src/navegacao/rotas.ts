@@ -59,7 +59,14 @@ export function useRota(): Rota {
   const [rota, setRota] = useState<Rota>(() => rotaDaUrl())
 
   useEffect(() => {
-    const aoMudar = () => setRota(rotaDaUrl())
+    const aoMudar = () => {
+      setRota(rotaDaUrl())
+      // Tela nova começa no topo. Sem isto, abrir uma ficha a partir de uma
+      // lista rolada abre a ficha no meio: o navegador mantém o offset, e
+      // como as duas telas são longas ele cabe nas duas. O nome da planta
+      // ficava acima da dobra.
+      window.scrollTo(0, 0)
+    }
     window.addEventListener('hashchange', aoMudar)
     return () => window.removeEventListener('hashchange', aoMudar)
   }, [])

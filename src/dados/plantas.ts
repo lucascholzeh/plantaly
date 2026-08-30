@@ -6,6 +6,8 @@ import type { PlantaComStatus, PlantaLinha, StatusLinha } from './tipos'
 export interface NovaPlanta {
   apelido: string
   especie: string
+  /** Slug do catálogo, quando a espécie veio de lá. Nulo em texto livre. */
+  especieSlug?: string | null
   ambiente: Ambiente
   /** Intervalos de referência, antes do ajuste de ambiente. */
   intervaloQuente: number
@@ -70,8 +72,12 @@ export async function criarPlanta(nova: NovaPlanta): Promise<string> {
     .insert({
       user_id: sessao.user.id,
       nickname: nova.apelido.trim(),
+      // O slug é o que liga a planta ao catálogo: sem ele o bloco de
+      // recuperação e a nota de adubação da espécie nunca aparecem, porque
+      // ambos consultam `species_slug`.
+      species_slug: nova.especieSlug || null,
       species_label: nova.especie.trim() || null,
-      species_source: 'manual',
+      species_source: nova.especieSlug ? 'catalogo' : 'manual',
       environment: nova.ambiente,
       water_interval_warm: ajustarPorAmbiente(nova.intervaloQuente, nova.ambiente),
       water_interval_cold: ajustarPorAmbiente(nova.intervaloFrio, nova.ambiente),

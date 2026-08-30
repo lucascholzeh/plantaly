@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { Botao, Cartao } from '../visual/componentes'
-import { conviteDispensado, dispensarConvite, ehIOS, ehSafari, estaInstalado } from './instalacao'
+import {
+  conviteDispensado,
+  dispensarConvite,
+  ehIOS,
+  ehSafari,
+  estaInstalado,
+  marcarComoInstalado,
+} from './instalacao'
 
 /**
  * Convite para adicionar à Tela de Início.
@@ -16,6 +23,11 @@ export function ConviteInstalacao() {
 
   function dispensar() {
     dispensarConvite()
+    setDispensado(true)
+  }
+
+  function jaAdicionei() {
+    marcarComoInstalado()
     setDispensado(true)
   }
 
@@ -55,9 +67,14 @@ export function ConviteInstalacao() {
         <li>Abra o Plantaly pelo ícone novo, não mais pelo Safari.</li>
       </ol>
 
-      <Botao variante="discreto" onClick={dispensar}>
-        Agora não
-      </Botao>
+      <div className="acoes">
+        <Botao variante="secundario" onClick={jaAdicionei}>
+          Já adicionei
+        </Botao>
+        <Botao variante="discreto" onClick={dispensar}>
+          Agora não
+        </Botao>
+      </div>
     </Cartao>
   )
 }

@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { BlocoAdubacao } from './BlocoAdubacao'
 import { BlocoAprendizado } from './BlocoAprendizado'
 import { BlocoFloracao } from './BlocoFloracao'
+import { BlocoFoto } from './BlocoFoto'
 import { BlocoRecuperacao } from './BlocoRecuperacao'
 import { historicoDaPlanta, registrarEvento } from '../dados/eventos'
 import { arquivarPlanta, buscarPlanta, excluirPlanta } from '../dados/plantas'
 import { useCarregamento } from '../dados/useCarregamento'
 import { diferencaEmDias } from '../dominio/datas'
 import { irPara } from '../navegacao/rotas'
-import { Aviso, Botao, Campo, Cartao, Etiqueta } from '../visual/componentes'
+import { Aviso, Botao, Campo, Carregando, Cartao, Etiqueta } from '../visual/componentes'
 import { estadoVisual } from './estados'
 import {
   descreverDistancia,
@@ -16,6 +17,7 @@ import {
   formatarDia,
   formatarDiaCompleto,
   NOMES_EVENTO,
+  ROTULOS_ESTACAO,
 } from './textos'
 
 export function FichaPlanta({ id }: { id: string }) {
@@ -27,8 +29,9 @@ export function FichaPlanta({ id }: { id: string }) {
   const [falha, setFalha] = useState<string | null>(null)
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false)
   const [textoExclusao, setTextoExclusao] = useState('')
+  const [confirmandoArquivo, setConfirmandoArquivo] = useState(false)
 
-  if (planta.carregando && !planta.dados) return <p>Carregando…</p>
+  if (planta.carregando && !planta.dados) return <Carregando />
 
   if (planta.erro) {
     return (
@@ -123,7 +126,7 @@ export function FichaPlanta({ id }: { id: string }) {
             {/* Mostrar a estação evita que a virada de abril ou outubro
                 pareça defeito quando a previsão mudar de uma vez. */}
             <dd>
-              {status.intervalo_rega} dias · estação {status.estacao}
+              {status.intervalo_rega} dias · {ROTULOS_ESTACAO[status.estacao] ?? status.estacao}
             </dd>
           </div>
         </dl>
@@ -132,6 +135,8 @@ export function FichaPlanta({ id }: { id: string }) {
           {salvando ? 'Salvando…' : 'Reguei hoje'}
         </Botao>
       </Cartao>
+
+      <BlocoFoto planta={p} aoMudar={recarregarTudo} />
 
       <BlocoAprendizado planta={p} status={status} aoMudar={recarregarTudo} />
 
@@ -197,13 +202,31 @@ export function FichaPlanta({ id }: { id: string }) {
         </p>
 
         <div className="acoes">
-          <Botao variante="secundario" onClick={arquivar}>
+          <Botao variante="secundario" onClick={() => setConfirmandoArquivo(true)}>
             Arquivar
           </Botao>
           <Botao variante="discreto" onClick={() => setConfirmandoExclusao(true)}>
             Excluir
           </Botao>
         </div>
+
+        {/* Arquivar some com a planta da lista e navega embora na mesma
+            batida. Preserva o histórico, mas não havia como desfazer nem
+            aviso nenhum — um toque errado e a planta sumia. */}
+        {confirmandoArquivo && (
+          <div className="formulario__campos">
+            <Aviso tom="atencao">
+              {p.nickname} sai da lista e para de aparecer na aba “Hoje”. Todo o histórico fica
+              guardado.
+            </Aviso>
+            <div className="acoes">
+              <Botao onClick={arquivar}>Arquivar</Botao>
+              <Botao variante="discreto" onClick={() => setConfirmandoArquivo(false)}>
+                Cancelar
+              </Botao>
+            </div>
+          </div>
+        )}
 
         {confirmandoExclusao && (
           <div className="formulario__campos">
@@ -213,11 +236,17 @@ export function FichaPlanta({ id }: { id: string }) {
             {/* Confirmação digitada, não um "tem certeza?": exclusão real
                 leva o histórico junto, e o histórico é o que o projeto
                 promete nunca perder. */}
+            {/* Sem `autoCapitalize`, o Safari do iPhone põe maiúscula na
+                primeira letra e a comparação exata nunca passa: planta com
+                apelido em minúscula ficava impossível de excluir. */}
             <Campo
               rotulo={`Digite ${p.nickname} para confirmar`}
               value={textoExclusao}
               onChange={(e) => setTextoExclusao(e.target.value)}
               autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <div className="acoes">
               <Botao disabled={textoExclusao.trim() !== p.nickname} onClick={excluir}>

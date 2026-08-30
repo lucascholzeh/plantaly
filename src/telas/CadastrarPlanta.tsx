@@ -65,6 +65,7 @@ export function CadastrarPlanta({ especieInicial }: { especieInicial?: string })
       const id = await criarPlanta({
         apelido,
         especie,
+        especieSlug: slugEspecie || null,
         ambiente,
         intervaloQuente,
         intervaloFrio,
@@ -105,12 +106,17 @@ export function CadastrarPlanta({ especieInicial }: { especieInicial?: string })
             ))}
           </Seletor>
 
+          {/* Obrigatório porque o banco exige espécie (`especie_identificada`):
+              slug do catálogo ou nome livre, um dos dois. O texto antigo
+              convidava a deixar em branco e o cadastro falhava com o erro cru
+              do Postgres. */}
           {slugEspecie === '' && (
             <Campo
               rotulo="Nome da espécie"
               value={especie}
               onChange={(e) => setEspecie(e.target.value)}
-              ajuda="Se não souber, deixe em branco. O catálogo cresce em ondas."
+              required
+              ajuda="Se não souber o nome exato, escreva como você a chama — “samambaia”, “aquela de flor rosa”."
             />
           )}
 
@@ -204,7 +210,10 @@ export function CadastrarPlanta({ especieInicial }: { especieInicial?: string })
       {erro && <Aviso tom="erro">{erro}</Aviso>}
 
       <div className="acoes">
-        <Botao type="submit" disabled={salvando || apelido.trim() === ''}>
+        <Botao
+          type="submit"
+          disabled={salvando || apelido.trim() === '' || (!slugEspecie && especie.trim() === '')}
+        >
           {salvando ? 'Salvando…' : 'Cadastrar'}
         </Botao>
         <Botao variante="discreto" onClick={voltar}>

@@ -221,4 +221,98 @@ describe('isolamento entre contas (RLS)', () => {
       expect(error).not.toBeNull()
     })
   })
+
+  /**
+   * Fotos das plantas (bucket `fotos-plantas`, migracao 0007).
+   *
+   * O bucket e privado e as politicas comparam a primeira pasta do caminho
+   * com o `auth.uid()` de quem consulta. O erro classico aqui e criar o
+   * bucket como publico: as tabelas continuariam isoladas e as imagens
+   * vazariam mesmo assim, sem nenhum teste de tabela acusar.
+   */
+  describe('fotos das plantas', () => {
+    // Um JPEG minusculo de verdade: o Storage recusa o upload se o
+    // content-type nao bater com o conteudo.
+    const JPEG = Uint8Array.from([
+      0xff, 0xd8, 0xff, 0xdb, 0x00, 0x43, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x0b, 0x08,
+      0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x11, 0x00, 0xff, 0xc4, 0x00, 0x14, 0x00, 0x01, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+      0xff, 0xc4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00,
+      0x3f, 0x00, 0x37, 0xff, 0xd9,
+    ])
+
+    const BUCKET = 'fotos-plantas'
+    let caminhoDeA: string
+
+    beforeAll(async () => {
+      caminhoDeA = `${usuarioA}/${plantaDeA}.jpg`
+      const { error } = await clienteA.storage
+        .from(BUCKET)
+        .upload(caminhoDeA, JPEG, { contentType: 'image/jpeg', upsert: true })
+
+      if (error) {
+        throw new Error(
+          `A conta A nao conseguiu enviar a foto: ${error.message}. ` +
+            'A migracao 0007 foi aplicada no banco?',
+        )
+      }
+    })
+
+    afterAll(async () => {
+      if (caminhoDeA) await clienteA.storage.from(BUCKET).remove([caminhoDeA])
+    })
+
+    it('a conta B nao consegue baixar a foto da conta A', async () => {
+      const { data, error } = await clienteB.storage.from(BUCKET).download(caminhoDeA)
+      expect(error).not.toBeNull()
+      expect(data).toBeNull()
+    })
+
+    it('a conta B nao consegue assinar uma URL para a foto da conta A', async () => {
+      // Assinar seria suficiente para vazar: a URL assinada dispensa login.
+      const { data, error } = await clienteB.storage.from(BUCKET).createSignedUrl(caminhoDeA, 60)
+      expect(error).not.toBeNull()
+      expect(data).toBeNull()
+    })
+
+    it('a conta B nao enxerga a foto de A ao listar a pasta dela', async () => {
+      const { data } = await clienteB.storage.from(BUCKET).list(usuarioA)
+      expect(data ?? []).toEqual([])
+    })
+
+    it('a conta B nao consegue gravar dentro da pasta da conta A', async () => {
+      const { error } = await clienteB.storage
+        .from(BUCKET)
+        .upload(`${usuarioA}/invasao.jpg`, JPEG, { contentType: 'image/jpeg' })
+      expect(error).not.toBeNull()
+    })
+
+    it('a conta B nao consegue apagar a foto da conta A', async () => {
+      await clienteB.storage.from(BUCKET).remove([caminhoDeA])
+
+      // O `remove` do Storage responde sem erro mesmo quando o RLS filtra
+      // tudo — o que prova o isolamento e o arquivo continuar la.
+      const { data } = await clienteA.storage.from(BUCKET).download(caminhoDeA)
+      expect(data).not.toBeNull()
+    })
+
+    it('o anonimo nao consegue baixar a foto', async () => {
+      const { data, error } = await clienteAnonimo.storage.from(BUCKET).download(caminhoDeA)
+      expect(error).not.toBeNull()
+      expect(data).toBeNull()
+    })
+
+    it('a propria conta A continua conseguindo baixar a sua foto', async () => {
+      // O contrapeso dos testes acima: uma politica que negasse tudo
+      // passaria em todos eles e deixaria o app sem foto nenhuma.
+      const { data, error } = await clienteA.storage.from(BUCKET).download(caminhoDeA)
+      expect(error).toBeNull()
+      expect(data).not.toBeNull()
+    })
+  })
 })

@@ -9,9 +9,13 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0 a 3 e 5 a 7 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. A Etapa 8 (assistente) fica para depois, por decisão do Lucas.
+**Etapas 0 a 3 e 5 a 7 feitas. Etapa 4 (catálogo) na onda 2**, com 10 espécies de ~30 previstas, todas com foto conferida. A Etapa 8 (assistente) fica para depois, por decisão do Lucas.
 
-**Pendente:** instalar o PWA nos dois iPhones e ativar os lembretes — único passo que exige aparelho real. Migrações 0001-0006 aplicadas; segredos enviados; Edge Function `enviar-lembretes` ACTIVE e respondendo 200.
+**Foto da planta do usuário (2026-08-30).** Estava na tabela de fora de escopo da seção 3 do design; o Lucas pediu e decidiu por Supabase Storage. Bucket privado `fotos-plantas`, uma pasta por conta, caminho `<user_id>/<planta_id>.jpg` gravado em `plants.photo_path`. **A foto acompanha o apelido, nunca o substitui** — sem foto, o balão mostra a inicial. Migração 0007 aplicada e conferida ponta a ponta: enviar, exibir na lista e remover. A redução no navegador levou uma foto de 871 kB para 256 kB.
+
+**Próxima rega no balão: sempre em dias, nunca em data.** `proximaRegaEmLinha` já mostrou "Regar 7 de outubro" e o Lucas recusou em 2026-08-30 — a data obriga a abrir o calendário para descobrir se é longe. Só "hoje" e "amanhã" escapam da contagem, por serem mais curtos que ela. A data por extenso continua na ficha da planta.
+
+**Pendente:** instalar o PWA nos dois iPhones e ativar os lembretes — único passo que exige aparelho real. Migrações 0001-0007 aplicadas; segredos enviados; Edge Function `enviar-lembretes` ACTIVE e respondendo 200.
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 
@@ -27,11 +31,15 @@ Etapa 3: view `plant_status` no banco, camada de dados em `src/dados/`, telas re
 
 **Ao criar view nova:** sempre `with (security_invoker = true)`. Sem isso a view roda com os privilégios do dono e ignora o RLS de quem consulta.
 
+**Ao mexer no bucket de fotos:** o isolamento vem de `(storage.foldername(name))[1] = auth.uid()::text` — a primeira pasta do caminho é o id do dono. Mudar o formato do caminho em `src/dados/fotos.ts` sem mudar as políticas do 0007 abre as fotos de uma conta para a outra. `create policy` não aceita `if not exists`, por isso o 0007 faz `drop policy if exists` antes de cada uma. **Bucket privado, nunca público:** com bucket público as tabelas continuariam isoladas e as imagens vazariam mesmo assim, sem nenhum teste de tabela acusar — daí a seção "fotos das plantas" em `testes/isolamento.test.ts`.
+
+**Coluna nova de planta chega `undefined`, não `null`, num banco sem a migração.** `photo_path !== null` dava verdadeiro e fazia o botão "Remover" aparecer em planta sem foto. Use truthiness ao ler coluna recém-criada.
+
 Etapa 4 (em ondas): catálogo em `src/catalogo/`, com validação de integridade na build. 6 espécies na onda 1 — phalaenopsis, lírio-da-paz, violeta-africana, kalanchoe, echeveria, antúrio.
 
 **Ao acrescentar espécie:** consulte a fonte de verdade antes de escrever qualquer número, e preencha `fontes` com a URL. Se a faixa de dias for tradução sua de um critério qualitativo (o caso normal — as fontes dizem "quando secar", não "a cada 8 dias"), marque `numerosDerivados: true`.
 
-**Ao acrescentar foto:** `node scripts/buscar-fotos.mjs "<termo>" <prefixo>` baixa candidatas para `fotos-triagem/`. **Abra cada imagem antes de aceitar.** A busca do Wikimedia devolve arquivos cujo texto menciona a espécie, incluindo livro digitalizado — uma candidata a "violeta africana" era a capa de um catálogo de sementes de 1897. Espécie sem foto conferida precisa preencher `semFotoAinda` dizendo por quê.
+**Ao acrescentar foto:** `node scripts/buscar-fotos.mjs "<termo>" <prefixo>` baixa candidatas para `fotos-triagem/`. **Abra cada imagem antes de aceitar.** Boa parte das candidatas volta "PULADA" (o Wikimedia limita rajada) — peça 5 para ficar com 2 ou 3 utilizáveis. Rejeite também a foto tecnicamente correta que não identifica: um macro de estame de violeta não deixa ninguém reconhecer a planta. Acima de ~400 kB, reduza com `sharp` (grave num arquivo temporário e mova; escrever sobre a própria origem dá `UNKNOWN: open`). A busca do Wikimedia devolve arquivos cujo texto menciona a espécie, incluindo livro digitalizado — uma candidata a "violeta africana" era a capa de um catálogo de sementes de 1897. Espécie sem foto conferida precisa preencher `semFotoAinda` dizendo por quê.
 
 **Galeria do sistema visual:** `npm run dev` e abrir `#/galeria` — só em desenvolvimento. Mostra todos os componentes e todos os estados juntos.
 

@@ -12,6 +12,8 @@ export interface PlantaLinha {
   species_slug: string | null
   species_label: string | null
   species_source: OrigemEspecie
+  /** Caminho da foto no bucket `fotos-plantas`. Nulo = sem foto. */
+  photo_path: string | null
   environment: Ambiente
   water_interval_warm: number
   water_interval_cold: number

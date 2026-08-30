@@ -59,6 +59,15 @@
   width: 100%;
 }
 
+/* Rótulo do botão nunca quebra em duas linhas nem encolhe abaixo do próprio
+   texto. Sem isto, dentro de `.acoes` o botão cedia espaço para o campo de
+   data — que tem largura intrínseca fixa e não encolhe — e os dois se
+   sobrepunham no Safari do iPhone, onde o controle nativo é mais largo. */
+.botao {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 /* --------------------------------------------------------------- cartão */
 
 .cartao {
@@ -367,9 +376,22 @@
   gap: var(--espaco-sm);
 }
 
+/* `capitalize` põe maiúscula em TODA palavra e produzia "Agosto De 2026".
+   `::first-letter` levanta só a inicial, que é o que o português pede. */
 .mes__nome {
   font-size: var(--texto-md);
-  text-transform: capitalize;
+}
+
+.mes__nome::first-letter {
+  text-transform: uppercase;
+}
+
+/* Alvo de toque de 44px também nas setas: eram 39px de largura, abaixo do
+   mínimo que o resto do app respeita. */
+.mes__seta {
+  min-width: 44px;
+  padding: 0;
+  font-size: var(--texto-lg);
 }
 
 .mes__grade {
@@ -385,6 +407,9 @@
   font-weight: 700;
   color: var(--texto-suave);
   padding-bottom: var(--espaco-xs);
+  /* `abbr` vem com sublinhado pontilhado e cursor de ajuda por padrão. */
+  text-decoration: none;
+  cursor: default;
 }
 
 .mes__dia {
@@ -484,4 +509,73 @@
   height: 1.1em;
   vertical-align: -0.2em;
   color: var(--primaria-base);
+}
+
+/* ---------------------------------------------------- foto da planta */
+
+.foto-planta {
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Em tom da própria paleta, nunca cinza — mesma regra das superfícies. */
+  border: 1px solid var(--superficie-borda);
+  background: var(--primaria-tint);
+}
+
+.foto-planta--lista {
+  width: 3rem;
+  height: 3rem;
+}
+
+.foto-planta--ficha {
+  width: 5rem;
+  height: 5rem;
+}
+
+/* Sem foto: a inicial do apelido sobre o realce da paleta. */
+.foto-planta--inicial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primaria-escura);
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Por tamanho, e não em porcentagem: `%` em `font-size` herda do elemento
+   pai, que aqui é o cartão — a letra sairia do tamanho do texto do cartão,
+   não do balão. */
+.foto-planta--lista.foto-planta--inicial {
+  font-size: 1.25rem;
+}
+
+.foto-planta--ficha.foto-planta--inicial {
+  font-size: 2rem;
+}
+
+/* ------------------------------------------- bloco de foto (ficha) */
+
+.foto-bloco {
+  display: flex;
+  gap: var(--espaco-md);
+  align-items: flex-start;
+}
+
+.foto-bloco__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+  min-width: 0;
+}
+
+/* Fora da tela em vez de `display: none` ou `hidden`: escondido assim, o
+   Safari do iPhone ignora o `.click()` disparado pelo botão, e o seletor de
+   foto simplesmente não abre. */
+.foto-bloco__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }

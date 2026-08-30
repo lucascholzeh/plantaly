@@ -5,6 +5,7 @@ import type { PlantaLinha, StatusLinha } from '../dados/tipos'
 import { useCarregamento } from '../dados/useCarregamento'
 import { sugerirAjuste } from '../dominio/aprendizado'
 import { Aviso, Botao, Cartao } from '../visual/componentes'
+import { ROTULOS_ESTACAO } from './textos'
 
 /**
  * Sugestão de ajuste de intervalo, a partir do comportamento real.
@@ -86,7 +87,7 @@ export function BlocoAprendizado({
       <p>
         Você tem regado esta planta a cada <strong>{sugestao.intervaloSugerido} dias</strong>, mas
         ela está configurada para {sugestao.intervaloAtual}. Quer usar o ritmo que você já pratica
-        na estação {status.estacao}?
+        na {ROTULOS_ESTACAO[status.estacao] ?? `estação ${status.estacao}`}?
       </p>
 
       <p className="formulario__nota">Intervalos observados nas últimas regas: {observado} dias.</p>

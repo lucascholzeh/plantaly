@@ -127,6 +127,26 @@ describe('busca', () => {
     expect(procurarEspecies('borboleta').map((e) => e.slug)).toContain('phalaenopsis')
   })
 
+  it('encontra as espécies da onda 2 pelo nome que se usa em casa', () => {
+    // Os nomes que o Lucas pediu, escritos como se escreve na busca do
+    // celular — sem acento e em minúscula.
+    expect(procurarEspecies('espada').map((e) => e.slug)).toContain('espada-de-sao-jorge')
+    expect(procurarEspecies('jiboia').map((e) => e.slug)).toContain('jiboia')
+    expect(procurarEspecies('bambu').map((e) => e.slug)).toContain('bambu-da-sorte')
+    expect(procurarEspecies('rosa do deserto').map((e) => e.slug)).toContain('rosa-do-deserto')
+  })
+
+  it('encontra a espada pelos dois nomes de gênero', () => {
+    // A Sansevieria foi reclassificada como Dracaena. Quem comprou a planta
+    // há dez anos procura pelo nome antigo, e ele está nos apelidos.
+    expect(procurarEspecies('sansevieria').map((e) => e.slug)).toContain('espada-de-sao-jorge')
+    expect(procurarEspecies('Dracaena').map((e) => e.slug)).toContain('espada-de-sao-jorge')
+  })
+
+  it('encontra a jiboia pelo nome de loja', () => {
+    expect(procurarEspecies('pothos').map((e) => e.slug)).toContain('jiboia')
+  })
+
   it('termo vazio devolve tudo', () => {
     expect(procurarEspecies('  ')).toHaveLength(ESPECIES.length)
   })

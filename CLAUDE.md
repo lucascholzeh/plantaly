@@ -9,9 +9,9 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 ## Estado atual
 
-**Etapas 0 a 3, 5 e 6 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. Próxima: Etapa 7 (notificações push). A Etapa 8 (assistente) fica para depois, por decisão do Lucas.
+**Etapas 0 a 3 e 5 a 7 feitas. Etapa 4 (catálogo) na onda 1**, com 6 espécies de ~30 previstas. A Etapa 8 (assistente) fica para depois, por decisão do Lucas.
 
-**Pendente:** aplicar a migração `0005_intervalo_recusado.sql` no Supabase. Sem ela o bloco de aprendizado quebra ao recusar uma sugestão.
+**Pendente:** instalar o PWA nos dois iPhones e ativar os lembretes — único passo que exige aparelho real. Migrações 0001-0006 aplicadas; segredos enviados; Edge Function `enviar-lembretes` ACTIVE e respondendo 200.
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 
@@ -43,6 +43,8 @@ Etapa 4 (em ondas): catálogo em `src/catalogo/`, com validação de integridade
 
 - **App:** Vercel, em `https://plantaly.vercel.app`. A URL longa com hash é específica de um deploy e fica atrás do login do Vercel — a de produção é a curta.
 - **Build no Vercel precisa das três variáveis `VITE_*`.** Sem elas o bundle sai sem a URL do Supabase e o app mostra tela branca: o cliente lança erro antes de montar. Conferir com `curl -s https://plantaly.vercel.app/assets/index-*.js | grep -c supabase.co` — zero significa build sem variáveis.
+- **O Vercel builda a `main`.** Uma etapa que vive só na branch não existe em produção, e o sintoma engana: em 2026-08-30 a Etapa 7 estava na `feat/push-ios`, o build caía em `generateSW` (descartando o `src/sw.ts` feito à mão) e a chave VAPID não entrava no bundle — porque nenhum código que a lê estava publicado. Passamos rodadas conferindo a variável de ambiente, que estava certa desde o início. **Antes de investigar variável que "não entra no build", confira se o código que a lê está na `main`.** No log do Vercel, `mode generateSW` em vez de `injectManifest` é o sinal.
+- **Hash do bundle igual = build sem mudança.** O Vite deriva o nome do conteúdo. Se `assets/index-*.js` não mudou de nome depois de um deploy, nada novo foi compilado — não adianta procurar a causa dentro do bundle.
 - **Segredos da Edge Function** (`VAPID_PRIVATE_KEY`, `SEGREDO_AGENDADOR`) nunca vão para o Vercel. Só para o Supabase, via `npm run segredos`.
 
 ## Comandos

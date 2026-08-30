@@ -11,6 +11,7 @@
  */
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
+import { montarMensagem, type Pendencia } from './variacoes.ts'
 
 const URL_SUPABASE = Deno.env.get('SUPABASE_URL')!
 const CHAVE_SERVICO = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -37,29 +38,6 @@ function horaLocal(fuso: string): number {
   return Number(formatada)
 }
 
-interface Pendencia {
-  nickname: string
-  situacao_rega: string
-  situacao_adubacao: string | null
-}
-
-function montarMensagem(pendencias: Pendencia[]): { titulo: string; corpo: string } {
-  const nomes = pendencias.map((p) => p.nickname)
-  const quantidade = nomes.length
-
-  const titulo =
-    quantidade === 1
-      ? '1 planta precisa de você hoje'
-      : `${quantidade} plantas precisam de você hoje`
-
-  // Lista até três nomes; além disso a notificação vira parágrafo e o iOS
-  // trunca do mesmo jeito.
-  const corpo =
-    quantidade <= 3 ? nomes.join(', ') : `${nomes.slice(0, 3).join(', ')} e mais ${quantidade - 3}`
-
-  return { titulo, corpo }
-}
-
 Deno.serve(async (requisicao) => {
   // Só o agendador chama esta função. Sem esta checagem, qualquer pessoa
   // com a URL dispararia notificações para todo mundo.
@@ -70,7 +48,7 @@ Deno.serve(async (requisicao) => {
 
   const { data: perfis, error: erroPerfis } = await supabase
     .from('profiles')
-    .select('id, time_zone, notification_hour')
+    .select('id, time_zone, notification_hour, ultima_variacao')
 
   if (erroPerfis) {
     return Response.json({ erro: erroPerfis.message }, { status: 500 })
@@ -118,8 +96,17 @@ Deno.serve(async (requisicao) => {
       .select('id, endpoint, p256dh, auth_key')
       .eq('user_id', perfil.id)
 
-    const { titulo, corpo } = montarMensagem(pendencias as Pendencia[])
+    // O sorteio exclui a variação da véspera: ver `variacoes.ts`.
+    const { titulo, corpo, variacao } = montarMensagem(
+      pendencias as Pendencia[],
+      perfil.ultima_variacao ?? null,
+    )
     const carga = JSON.stringify({ titulo, corpo, url: '/#/hoje' })
+
+    // Grava antes de enviar. Se o envio falhar, o pior caso é pular uma
+    // variação; se gravasse depois, uma falha parcial repetiria o texto
+    // amanhã — que é justamente o que a coluna existe para evitar.
+    await supabase.from('profiles').update({ ultima_variacao: variacao }).eq('id', perfil.id)
 
     for (const inscricao of inscricoes ?? []) {
       try {

@@ -33,3 +33,8 @@ Thumbs.db
 npm-debug.log*
 fotos-triagem/
 vercel-env.txt
+
+# Vinculo local com o projeto Vercel (id do projeto, token OIDC).
+# O .env local ja e ignorado nas linhas do topo, com a excecao do .env.example.
+.vercel/
+.env.local

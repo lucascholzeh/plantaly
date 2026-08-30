@@ -29,9 +29,11 @@ export function ehSafari(): boolean {
 }
 
 const CHAVE_DISPENSA = 'plantaly:convite-instalacao-dispensado'
+const CHAVE_JA_INSTALADO = 'plantaly:ja-instalado'
 
 export function conviteDispensado(): boolean {
   try {
+    if (window.localStorage.getItem(CHAVE_JA_INSTALADO) === 'sim') return true
     const ate = window.localStorage.getItem(CHAVE_DISPENSA)
     return ate !== null && Number(ate) > Date.now()
   } catch {
@@ -48,5 +50,22 @@ export function dispensarConvite(): void {
     window.localStorage.setItem(CHAVE_DISPENSA, String(umaSemana))
   } catch {
     // Sem armazenamento não há o que fazer; o convite volta na próxima visita.
+  }
+}
+
+/**
+ * "Já adicionei": esconde o convite para sempre.
+ *
+ * A detecção automática (`estaInstalado`) já esconde o convite quando o app
+ * roda pela Tela de Início. Mas o Safari e o app instalado têm
+ * `localStorage` separados, então quem instalou e depois volta ao Safari vê
+ * o convite de novo, para sempre — e não tem como dizer que já fez. Este é o
+ * caminho para essa pessoa sair do laço.
+ */
+export function marcarComoInstalado(): void {
+  try {
+    window.localStorage.setItem(CHAVE_JA_INSTALADO, 'sim')
+  } catch {
+    // Sem armazenamento o convite volta; nada a fazer além de não quebrar.
   }
 }

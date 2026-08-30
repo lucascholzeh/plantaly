@@ -19,13 +19,27 @@ export function Especies() {
 
   return (
     <>
+      {/* Nome científico não deve ser corrigido nem capitalizado pelo iOS:
+          "Phalaenopsis" vira outra coisa e a busca não acha nada. */}
       <Campo
         rotulo="Buscar espécie"
         type="search"
         value={termo}
         onChange={(e) => setTermo(e.target.value)}
+        autoComplete="off"
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
         ajuda="Nome popular, científico ou apelido."
       />
+
+      {/* O número de resultados muda enquanto se digita, sem nada na tela
+          dizendo isso a quem não vê a lista encolher. */}
+      <p className="apenas-leitor" role="status">
+        {termo.trim() === ''
+          ? ''
+          : `${encontradas.length} ${encontradas.length === 1 ? 'espécie encontrada' : 'espécies encontradas'}.`}
+      </p>
 
       {encontradas.length === 0 && (
         <EstadoVazio

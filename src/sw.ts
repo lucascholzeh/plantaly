@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { clientsClaim } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
@@ -16,6 +17,19 @@ declare const self: ServiceWorkerGlobalScope
 
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
+
+/**
+ * Assume o controle assim que a versão nova instala.
+ *
+ * O modo `injectManifest` não injeta isto sozinho — só o `generateSW` faz. Sem
+ * as duas chamadas o worker novo instala e fica parado em `waiting` para
+ * sempre, esperando todas as abas fecharem. No app da Tela de Início do
+ * iPhone isso praticamente nunca acontece: fechar por gesto não encerra o
+ * cliente. O resultado era um deploy que nunca chegava ao aparelho, e o
+ * `registerType: 'autoUpdate'` esperando por um `activated` que não vinha.
+ */
+self.skipWaiting()
+clientsClaim()
 
 // Dados: rede primeiro, cache como rede de segurança. O contrário mostraria
 // a rega de ontem como se fosse de hoje.

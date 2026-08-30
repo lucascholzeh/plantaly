@@ -7,7 +7,22 @@ import { diaDaSemana, limitesDoMes, mesVizinho, projetar } from '../dominio/prev
 import { Aviso, Botao, Cartao, Motivo } from '../visual/componentes'
 import { formatarDiaCompleto, NOMES_EVENTO } from './textos'
 
-const SEMANA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
+/**
+ * Iniciais dos dias da semana, vindas do próprio `Intl`.
+ *
+ * 2026-02-01 é um domingo: sete dias a partir dele cobrem a semana na ordem
+ * que a grade usa. Escrever as letras à mão obrigaria a traduzi-las junto se
+ * o app mudar de idioma.
+ */
+const INICIAIS = new Intl.DateTimeFormat('pt-BR', { weekday: 'narrow' })
+const SEMANA = Array.from({ length: 7 }, (_, i) => INICIAIS.format(new Date(2026, 1, 1 + i, 12)))
+
+/** Nome completo do dia, para o rótulo do cabeçalho da coluna. */
+const NOME_DIA = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' })
+const SEMANA_COMPLETA = Array.from({ length: 7 }, (_, i) =>
+  NOME_DIA.format(new Date(2026, 1, 1 + i, 12)),
+)
+
 const MES = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' })
 
 interface Previsto {
@@ -93,20 +108,34 @@ export function Calendario() {
       <Cartao className="mes">
         <Motivo contexto="cabecalho" />
         <div className="mes__topo">
-          <Botao variante="discreto" onClick={() => setMes(mesVizinho(mes, -1))}>
-            ‹
+          <Botao
+            variante="discreto"
+            className="mes__seta"
+            onClick={() => setMes(mesVizinho(mes, -1))}
+            aria-label="Mês anterior"
+          >
+            <span aria-hidden="true">‹</span>
           </Botao>
           <h2 className="mes__nome">{MES.format(new Date(`${mes}T12:00:00`))}</h2>
-          <Botao variante="discreto" onClick={() => setMes(mesVizinho(mes, 1))}>
-            ›
+          <Botao
+            variante="discreto"
+            className="mes__seta"
+            onClick={() => setMes(mesVizinho(mes, 1))}
+            aria-label="Próximo mês"
+          >
+            <span aria-hidden="true">›</span>
           </Botao>
         </div>
 
-        <div className="mes__grade" role="grid">
+        {/* Sem `role="grid"`: era uma grade quebrada — 44 filhos diretos e
+            nenhum `row`/`gridcell`, o que confunde o leitor de tela mais que a
+            ausência do papel. Cada dia é um botão com nome acessível completo
+            ("sábado, 1 de agosto, sem nada"), que é o que importa aqui. */}
+        <div className="mes__grade" role="group" aria-label="Dias do mês">
           {SEMANA.map((letra, i) => (
-            <span className="mes__cabecalho" key={i} aria-hidden="true">
+            <abbr className="mes__cabecalho" key={i} title={SEMANA_COMPLETA[i]}>
               {letra}
-            </span>
+            </abbr>
           ))}
 
           {Array.from({ length: vaziosAntes }, (_, i) => (

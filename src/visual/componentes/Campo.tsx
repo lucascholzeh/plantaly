@@ -40,8 +40,11 @@ function Moldura({
         {rotulo}
       </label>
       {children}
+      {/* `role="alert"`: o erro aparece depois do envio, quando o foco já
+          saiu do campo. Sem isso o `aria-describedby` só seria lido se a
+          pessoa voltasse ao campo — ou seja, quase nunca. */}
       {erro && (
-        <span className="campo__erro" id={idErro}>
+        <span className="campo__erro" id={idErro} role="alert">
           {erro}
         </span>
       )}

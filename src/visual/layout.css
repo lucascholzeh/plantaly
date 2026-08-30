@@ -6,6 +6,36 @@
   flex-direction: column;
 }
 
+/* Sem isto, focar um campo perto do rodapé o deixava embaixo da barra fixa:
+   o navegador rola só o suficiente para o campo "aparecer", e a barra está
+   por cima. */
+html {
+  scroll-padding-bottom: calc(var(--altura-barra) + var(--area-segura-inferior) + var(--espaco-md));
+}
+
+/* Pular para o conteúdo: fora da tela até receber foco. */
+.app__pular {
+  position: absolute;
+  left: -9999px;
+  z-index: 20;
+  padding: var(--espaco-sm) var(--espaco-md);
+  border: 1px solid var(--superficie-borda-forte);
+  background: var(--superficie-elevada);
+  color: var(--primaria-base);
+  font-weight: 600;
+  border-radius: var(--raio-sm);
+}
+
+.app__pular:focus {
+  left: var(--espaco-md);
+  top: var(--espaco-md);
+}
+
+/* O alvo do "pular" não deve ganhar anel só por receber foco programático. */
+.app__conteudo:focus {
+  outline: none;
+}
+
 .app__cabecalho {
   position: relative;
   overflow: hidden;
@@ -171,11 +201,19 @@
   color: var(--texto-suave);
 }
 
+/* Três colunas: balão, texto, ação. O balão ocupa todas as linhas à
+   esquerda, e o botão todas à direita — o texto cresce no meio sem empurrar
+   nenhum dos dois. */
 .item {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--espaco-sm);
+}
+
+.item .foto-planta {
+  grid-column: 1;
+  grid-row: 1 / -1;
 }
 
 .item__nome,
@@ -195,27 +233,59 @@
   text-decoration: underline;
 }
 
-.item .etiqueta {
-  grid-column: 1;
-  justify-self: start;
-}
-
-.item .botao {
-  grid-row: 1 / span 2;
+.item__nome {
   grid-column: 2;
 }
 
+.item .etiqueta {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.item__proxima {
+  grid-column: 2;
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}
+
+.item .botao {
+  grid-row: 1 / -1;
+  grid-column: 3;
+}
+
+/* Foto à esquerda, texto à direita. `flex-start` alinha o balão ao topo do
+   bloco: centralizado, ele descia junto com a etiqueta e desalinhava a
+   lista quando um cartão tinha espécie e o outro não. */
 .planta {
+  display: flex;
+  flex-direction: row;
+  gap: var(--espaco-sm);
+  align-items: flex-start;
+}
+
+.planta__texto {
   display: flex;
   flex-direction: column;
   gap: var(--espaco-xs);
   align-items: flex-start;
+  /* Sem isto, apelido longo estoura o cartão em vez de truncar: item flex
+     não encolhe abaixo do conteúdo por padrão. */
+  min-width: 0;
+  max-width: 100%;
 }
 
 .planta__especie,
 .planta__rega {
   font-size: var(--texto-sm);
   color: var(--texto-suave);
+}
+
+/* A próxima rega é a resposta que a lista existe para dar: fica no tom do
+   texto principal, e não no suave das legendas. */
+.planta__proxima {
+  font-size: var(--texto-sm);
+  color: var(--texto-principal);
+  font-weight: 600;
 }
 
 .acoes {
@@ -231,9 +301,13 @@
   width: 100%;
 }
 
+/* 11rem cabe "dd/mm/aaaa" mais o ícone do seletor nativo do iOS, que é mais
+   largo que o do Chrome. Abaixo disso o campo encolhia por baixo do botão;
+   agora, quando não couber lado a lado, a linha quebra e cada um fica
+   inteiro. */
 .acoes .campo {
-  flex: 1;
-  min-width: 8rem;
+  flex: 1 1 11rem;
+  min-width: 11rem;
 }
 
 /* ----------------------------------------------------------- formulário */

@@ -28,7 +28,13 @@ function paraBytes(base64url: string): ArrayBuffer {
 }
 
 export type EstadoDoPush =
-  'indisponivel' | 'precisa-instalar' | 'sem-chave' | 'negado' | 'desativado' | 'ativo'
+  | 'indisponivel'
+  | 'precisa-instalar'
+  | 'sem-chave'
+  | 'sem-worker'
+  | 'negado'
+  | 'desativado'
+  | 'ativo'
 
 export async function estadoDoPush(): Promise<EstadoDoPush> {
   if (
@@ -44,7 +50,15 @@ export async function estadoDoPush(): Promise<EstadoDoPush> {
   if (!CHAVE_PUBLICA) return 'sem-chave'
   if (Notification.permission === 'denied') return 'negado'
 
-  const registro = await navigator.serviceWorker.ready
+  // `serviceWorker.ready` nunca rejeita: se nenhum worker assumir o controle,
+  // ela fica pendurada para sempre e a tela trava em "Verificando…". O limite
+  // transforma esse silêncio numa resposta.
+  const registro = await Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+  ])
+  if (!registro) return 'sem-worker'
+
   const assinatura = await registro.pushManager.getSubscription()
   return assinatura ? 'ativo' : 'desativado'
 }

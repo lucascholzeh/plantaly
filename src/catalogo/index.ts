@@ -27,23 +27,36 @@ export function buscarEspecie(slug: string): Especie | null {
   return POR_SLUG.get(slug) ?? null
 }
 
-function semAcento(texto: string): string {
-  return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+/**
+ * Forma comparável de um nome: sem acento, sem caixa e sem separador.
+ *
+ * Hífen e espaço viram a mesma coisa porque os nomes populares são escritos
+ * com hífen ("Rosa-do-deserto", "Espada-de-São-Jorge") e ninguém digita
+ * hífen no celular. Sem isto, "rosa do deserto" não encontrava a ficha que
+ * se chama exatamente assim.
+ */
+function comparavel(texto: string): string {
+  return texto
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[\s-]+/g, '')
 }
 
 /**
  * Busca por nome popular, científico ou apelido.
  *
- * Sem acento e sem caixa de propósito: ninguém digita "orquídea" com acento
- * no celular, e "Phalaenopsis" tem grafia difícil.
+ * Sem acento, sem caixa e sem separador de propósito: ninguém digita
+ * "orquídea" com acento no celular, "Phalaenopsis" tem grafia difícil, e
+ * quem procura a rosa-do-deserto escreve "rosa do deserto".
  */
 export function procurarEspecies(termo: string): Especie[] {
-  const alvo = semAcento(termo.trim())
+  const alvo = comparavel(termo)
   if (alvo === '') return ESPECIES
 
   return ESPECIES.filter((especie) =>
     [especie.nomePopular, especie.nomeCientifico, ...especie.apelidos].some((nome) =>
-      semAcento(nome).includes(alvo),
+      comparavel(nome).includes(alvo),
     ),
   )
 }

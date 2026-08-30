@@ -1,11 +1,24 @@
 import { MotionConfig } from 'framer-motion'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
 import { Galeria } from './visual/Galeria'
 import './visual/base.css'
 import './visual/componentes/componentes.css'
 import './visual/layout.css'
+
+/**
+ * Registra o service worker.
+ *
+ * Sem esta chamada o `vite-plugin-pwa` gera o arquivo mas ninguém o
+ * registra: no iPhone o push ainda funciona porque o próprio iOS registra o
+ * worker ao abrir o app instalado, mas o `registerType: 'autoUpdate'` fica
+ * morto — app instalado nunca recebe versão nova. E `serviceWorker.ready`
+ * fica pendurado para sempre no Safari comum, que é o que fazia os Ajustes
+ * relatarem "este navegador não envia notificações".
+ */
+registerSW({ immediate: true })
 
 /**
  * A galeria do sistema visual vive fora do App e só em desenvolvimento.

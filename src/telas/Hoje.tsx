@@ -3,11 +3,21 @@ import { apagarEvento, existeNoDia, registrarEvento } from '../dados/eventos'
 import { listarPlantas } from '../dados/plantas'
 import type { PlantaComStatus } from '../dados/tipos'
 import { useCarregamento } from '../dados/useCarregamento'
+import { useFotosAssinadas } from '../dados/useFotos'
+import { diferencaEmDias } from '../dominio/datas'
 import { irPara } from '../navegacao/rotas'
-import { Aviso, Botao, Cartao, EstadoVazio, Etiqueta } from '../visual/componentes'
+import {
+  Aviso,
+  Botao,
+  Carregando,
+  Cartao,
+  EstadoVazio,
+  Etiqueta,
+  FotoDaPlanta,
+} from '../visual/componentes'
 import { ConvitePush } from '../pwa/ConvitePush'
 import { estadoVisual } from './estados'
-import { detalheDoAtraso } from './textos'
+import { detalheDoAtraso, proximaRegaEmLinha } from './textos'
 
 interface Desfazivel {
   eventoId: string
@@ -24,6 +34,7 @@ interface Desfazivel {
  */
 export function Hoje() {
   const { dados, carregando, erro, recarregar } = useCarregamento(listarPlantas)
+  const fotos = useFotosAssinadas(dados)
   const [desfazivel, setDesfazivel] = useState<Desfazivel | null>(null)
   const [falha, setFalha] = useState<string | null>(null)
   const [ocupada, setOcupada] = useState<string | null>(null)
@@ -89,7 +100,7 @@ export function Hoje() {
     }
   }
 
-  if (carregando && !dados) return <p>Carregando…</p>
+  if (carregando && !dados) return <Carregando />
 
   if (erro) {
     return (
@@ -147,7 +158,7 @@ export function Hoje() {
       {falha && <Aviso tom="erro">Não salvei: {falha}</Aviso>}
 
       {duplicada && (
-        <Cartao elevado>
+        <Cartao elevado role="alert">
           <p>{duplicada.planta.nickname} já tem uma rega registrada hoje.</p>
           <div className="acoes">
             <Botao onClick={() => gravarRega(duplicada)}>Registrar mesmo assim</Botao>
@@ -158,8 +169,11 @@ export function Hoje() {
         </Cartao>
       )}
 
+      {/* `role="status"` porque este cartão é a única pista de que a rega foi
+          gravada — e de que dá para voltar atrás. Sem ele, quem usa leitor de
+          tela tocava em "Reguei" e não ouvia absolutamente nada. */}
       {desfazivel && (
-        <Cartao elevado>
+        <Cartao elevado role="status">
           <div className="acoes acoes--espalhadas">
             <span>
               {desfazivel.tipo} registrada em {desfazivel.planta}.
@@ -182,6 +196,7 @@ export function Hoje() {
             <ItemDeAdubacao
               key={item.planta.id}
               item={item}
+              urlFoto={urlDe(item, fotos)}
               ocupado={ocupada === item.planta.id}
               aoAdubar={() => aoAdubar(item)}
             />
@@ -197,6 +212,7 @@ export function Hoje() {
               <ItemDeHoje
                 key={item.planta.id}
                 item={item}
+                urlFoto={urlDe(item, fotos)}
                 ocupado={ocupada === item.planta.id}
                 aoRegar={() => aoRegar(item)}
               />
@@ -208,6 +224,12 @@ export function Hoje() {
   )
 }
 
+/** URL já assinada da foto do item, quando existir. */
+function urlDe(item: PlantaComStatus, fotos: Map<string, string>): string | null {
+  const caminho = item.planta.photo_path
+  return caminho ? (fotos.get(caminho) ?? null) : null
+}
+
 /**
  * Linha da seção de adubação.
  *
@@ -216,16 +238,19 @@ export function Hoje() {
  */
 function ItemDeAdubacao({
   item,
+  urlFoto,
   ocupado,
   aoAdubar,
 }: {
   item: PlantaComStatus
+  urlFoto: string | null
   ocupado: boolean
   aoAdubar: () => void
 }) {
   const { planta, status } = item
   return (
     <Cartao className="item">
+      <FotoDaPlanta caminho={planta.photo_path} apelido={planta.nickname} url={urlFoto} />
       <a className="item__nome" href={`#/plantas/${planta.id}`}>
         {planta.nickname}
       </a>
@@ -246,10 +271,12 @@ function ItemDeAdubacao({
 
 function ItemDeHoje({
   item,
+  urlFoto,
   ocupado,
   aoRegar,
 }: {
   item: PlantaComStatus
+  urlFoto: string | null
   ocupado: boolean
   aoRegar: () => void
 }) {
@@ -258,6 +285,7 @@ function ItemDeHoje({
 
   return (
     <Cartao className="item">
+      <FotoDaPlanta caminho={planta.photo_path} apelido={planta.nickname} url={urlFoto} />
       <a className="item__nome" href={`#/plantas/${planta.id}`}>
         {planta.nickname}
       </a>
@@ -265,6 +293,17 @@ function ItemDeHoje({
         estado={estadoVisual(status.situacao_rega)}
         detalhe={semHistorico ? 'sem histórico' : detalheDoAtraso(status.dias_de_atraso_rega)}
       />
+      {/* Nesta tela a próxima rega só faz sentido para quem não está
+          atrasado: quem está tem o botão "Reguei" logo ao lado, e "Regar
+          hoje" ao lado dele seria ruído. */}
+      {status.situacao_rega === 'em-dia' && status.proxima_rega && (
+        <p className="item__proxima">
+          {proximaRegaEmLinha(
+            status.proxima_rega,
+            diferencaEmDias(status.hoje, status.proxima_rega),
+          )}
+        </p>
+      )}
       <Botao onClick={aoRegar} disabled={ocupado}>
         {ocupado ? 'Salvando…' : 'Reguei'}
       </Botao>

@@ -35,3 +35,28 @@ export const ROTULOS_AMBIENTE: Record<Ambiente, string> = {
 export function ajustarPorAmbiente(intervaloBase: number, ambiente: Ambiente): number {
   return Math.max(1, Math.round(intervaloBase * FATORES[ambiente]))
 }
+
+/**
+ * O que sugerir quando a planta muda de lugar.
+ *
+ * A decisão estrutural 1 do design diz que o ambiente é aplicado **uma vez**,
+ * no cadastro, e a partir daí o intervalo é do usuário. Recalcular sozinho na
+ * edição quebraria isso duas vezes: por cima de um número que a pessoa possa
+ * ter ajustado à mão, e por cima do que o aprendizado por histórico já
+ * corrigiu a partir das regas reais.
+ *
+ * Então a troca de ambiente **sugere** e não aplica. Quem decide é a tela,
+ * mostrando o número antes.
+ *
+ * A conta desfaz o fator antigo antes de aplicar o novo — o valor guardado
+ * já vem ajustado pelo ambiente de origem. Multiplicar direto pelo fator
+ * novo aplicaria o ajuste duas vezes, e cada troca deformaria o número mais
+ * um pouco.
+ */
+export function sugerirPorMudancaDeAmbiente(
+  intervaloAtual: number,
+  de: Ambiente,
+  para: Ambiente,
+): number {
+  return Math.max(1, Math.round((intervaloAtual / FATORES[de]) * FATORES[para]))
+}

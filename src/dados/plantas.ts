@@ -105,12 +105,15 @@ export type CamposEditaveis = Partial<
   Pick<
     PlantaLinha,
     | 'nickname'
+    | 'species_slug'
     | 'species_label'
+    | 'species_source'
     | 'environment'
     | 'water_interval_warm'
     | 'water_interval_cold'
     | 'fertilize_interval_warm'
     | 'fertilize_interval_cold'
+    | 'drought_tolerance'
     | 'rejected_interval'
   >
 >

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BlocoAdubacao } from './BlocoAdubacao'
 import { BlocoAprendizado } from './BlocoAprendizado'
+import { BlocoEdicao } from './BlocoEdicao'
 import { BlocoFloracao } from './BlocoFloracao'
 import { BlocoFoto } from './BlocoFoto'
 import { BlocoRecuperacao } from './BlocoRecuperacao'
@@ -192,6 +193,8 @@ export function FichaPlanta({ id }: { id: string }) {
           <p className="formulario__nota">Nada registrado ainda.</p>
         )}
       </Cartao>
+
+      <BlocoEdicao planta={p} aoMudar={recarregarTudo} />
 
       <Cartao>
         <h2 className="lista__titulo">Tirar da lista</h2>

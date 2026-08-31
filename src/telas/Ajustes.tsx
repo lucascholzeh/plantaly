@@ -55,7 +55,7 @@ export function Ajustes() {
       perfil.recarregar()
       // Sem confirmação a troca de horário era muda: nada na tela dizia se
       // gravou. O aviso some na próxima troca.
-      setSalvo(`Lembrete movido para ${formatarHora(hora)}.`)
+      setSalvo(`Lembretes movidos para ${formatarHora(hora)}.`)
     } catch (e) {
       setErro(e instanceof Error ? e.message : String(e))
     }
@@ -133,13 +133,22 @@ export function Ajustes() {
           </>
         )}
 
-        {push === 'ativo' && perfil.dados && (
+        {/* Visível mesmo com o push desligado. O horário não governa só a
+            notificação: enquanto o push não estiver ligado — e no iPhone isso
+            exige instalar o app na Tela de Início — quem abrir esta tela
+            precisa conseguir escolher a hora assim mesmo, em vez de esbarrar
+            num seletor que só aparece depois. */}
+        {perfil.dados && push !== null && push !== 'indisponivel' && (
           <div className="formulario__campos">
             <Seletor
-              rotulo="Horário do lembrete"
+              rotulo="Horário das notificações"
               value={String(perfil.dados.notification_hour)}
               onChange={(e) => mudarHora(Number(e.target.value))}
-              ajuda={`No seu fuso (${perfil.dados.time_zone}). Uma notificação por dia, só quando houver algo vencendo.`}
+              ajuda={
+                push === 'ativo'
+                  ? `No seu fuso (${perfil.dados.time_zone}). Duas por manhã: o que regar — ou que não há nada — e a frase do dia.`
+                  : `No seu fuso (${perfil.dados.time_zone}). Guardado desde já: vale assim que os lembretes forem ligados.`
+              }
             >
               {HORAS.map((h) => (
                 <option key={h} value={h}>

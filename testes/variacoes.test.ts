@@ -5,7 +5,9 @@ import {
   elegiveis,
   montarContexto,
   montarMensagem,
+  montarMensagemCalma,
   sortear,
+  VARIACOES_CALMAS,
   type Pendencia,
 } from '../supabase/functions/enviar-lembretes/variacoes.ts'
 
@@ -192,5 +194,41 @@ describe('sorteio', () => {
     expect(titulo).toBeTruthy()
     expect(corpo).toContain(NOME_COMPOSTO)
     expect(VARIACOES.some((v) => v.nome === variacao)).toBe(true)
+  })
+})
+
+describe('variações de dia calmo', () => {
+  it('toda variação tem título e corpo', () => {
+    for (const v of VARIACOES_CALMAS) {
+      expect(v.titulo.length, v.nome).toBeGreaterThan(0)
+      expect(v.corpo.length, v.nome).toBeGreaterThan(0)
+    }
+  })
+
+  it('não repete nome', () => {
+    const nomes = VARIACOES_CALMAS.map((v) => v.nome)
+    expect(new Set(nomes).size).toBe(nomes.length)
+  })
+
+  it('nenhuma cita planta ou atraso', () => {
+    // Dia calmo não tem pendência, logo não tem nome nem número a citar.
+    // Um texto de dia calmo que fale em "dias" ou "plantas" está afirmando
+    // algo que os dados não sustentam.
+    for (const v of VARIACOES_CALMAS) {
+      expect(`${v.titulo} ${v.corpo}`, v.nome).not.toMatch(/\d+ (dia|planta)/)
+    }
+  })
+
+  it('não repete a variação da véspera', () => {
+    // Com 6 textos, repetir dois dias seguidos seria notado.
+    const ontem = VARIACOES_CALMAS[0].nome
+    for (let i = 0; i < 40; i++) {
+      expect(montarMensagemCalma(ontem, () => i / 40).variacao).not.toBe(ontem)
+    }
+  })
+
+  it('não quebra quando a véspera é desconhecida', () => {
+    expect(montarMensagemCalma(null).titulo.length).toBeGreaterThan(0)
+    expect(montarMensagemCalma('nome-que-nao-existe').titulo.length).toBeGreaterThan(0)
   })
 })

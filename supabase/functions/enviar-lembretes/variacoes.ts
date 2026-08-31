@@ -520,3 +520,58 @@ export function montarMensagem(
   const escolhida = sortear(contexto, ultima, aleatorio)
   return { ...escolhida.texto(contexto), variacao: escolhida.nome }
 }
+
+/**
+ * As variações de dia calmo — nenhuma planta pedindo nada.
+ *
+ * Antes, dia sem pendência era dia sem notificação. Agora a manhã tem
+ * notificação sempre, e esta é a versão de quando não há o que fazer. O
+ * texto precisa soar como boa notícia, não como aviso vazio: quem recebe
+ * "nada para regar hoje" e sente que perdeu tempo abrindo, desliga.
+ *
+ * Sem interpolação de nomes: não há pendência, logo não há nome a citar. Por
+ * isso são strings, e não funções como as outras.
+ */
+export const VARIACOES_CALMAS: { nome: string; titulo: string; corpo: string }[] = [
+  {
+    nome: 'calma-tudo-em-dia',
+    titulo: 'Tudo em dia 🌿',
+    corpo: 'Nenhuma planta precisa de água hoje. Aproveite a manhã.',
+  },
+  {
+    nome: 'calma-nada-hoje',
+    titulo: 'Nada para regar hoje',
+    corpo: 'Suas plantas estão todas satisfeitas. Só apreciar.',
+  },
+  {
+    nome: 'calma-folga',
+    titulo: 'Dia de folga 🌱',
+    corpo: 'Ninguém com sede por aqui. Volte amanhã.',
+  },
+  {
+    nome: 'calma-satisfeitas',
+    titulo: 'Todas satisfeitas',
+    corpo: 'Nenhuma rega pendente hoje — seu jardim está em ordem.',
+  },
+  {
+    nome: 'calma-sem-pendencia',
+    titulo: 'Manhã tranquila',
+    corpo: 'Nada vencendo hoje. Suas plantas agradecem o cuidado dos outros dias.',
+  },
+  {
+    nome: 'calma-descanso',
+    titulo: 'Sem tarefas 🌸',
+    corpo: 'Nenhuma planta pede água hoje. Descanse — você está em dia.',
+  },
+]
+
+/** Sorteia a mensagem de dia calmo, evitando a última enviada. */
+export function montarMensagemCalma(
+  ultima: string | null = null,
+  aleatorio: () => number = Math.random,
+): Mensagem & { variacao: string } {
+  const semRepetir = VARIACOES_CALMAS.filter((v) => v.nome !== ultima)
+  const conjunto = semRepetir.length > 0 ? semRepetir : VARIACOES_CALMAS
+  const escolhida = conjunto[Math.floor(aleatorio() * conjunto.length)]
+  return { titulo: escolhida.titulo, corpo: escolhida.corpo, variacao: escolhida.nome }
+}

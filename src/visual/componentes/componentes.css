@@ -579,3 +579,44 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ---------------------------------------------------------- frase do dia */
+
+/*
+ * Deliberadamente não é um `.cartao`: a frase não é uma planta nem uma ação,
+ * e repetir a mesma superfície faria o olho lê-la como mais um item da
+ * lista. A separação vem da barra à esquerda e do itálico, não de sombra.
+ */
+.frase-do-dia {
+  margin: var(--espaco-lg) 0 0;
+  padding: var(--espaco-md) var(--espaco-md) var(--espaco-md) var(--espaco-lg);
+  border-left: 3px solid var(--primaria-base);
+  background: var(--primaria-tint);
+  border-radius: 0 var(--raio-md) var(--raio-md) 0;
+}
+
+.frase-do-dia__texto {
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--texto-principal);
+}
+
+.frase-do-dia__autoria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-xs);
+  margin-top: var(--espaco-sm);
+  font-size: var(--texto-sm);
+  color: var(--texto-suave);
+}
+
+/* Sem itálico: o texto citado já é itálico, e itálico dentro de itálico
+   deixa de distinguir as duas coisas. */
+.frase-do-dia__obra {
+  font-style: normal;
+}
+
+.frase-do-dia__obra::before {
+  content: '· ';
+}

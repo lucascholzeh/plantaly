@@ -14,8 +14,10 @@ import {
   EstadoVazio,
   Etiqueta,
   FotoDaPlanta,
+  FraseDoDia,
 } from '../visual/componentes'
 import { ConvitePush } from '../pwa/ConvitePush'
+import { escolherFrase } from '../frases/escolha'
 import { estadoVisual } from './estados'
 import { detalheDoAtraso, proximaRegaEmLinha } from './textos'
 
@@ -142,6 +144,11 @@ export function Hoje() {
   )
   const semHistorico = por('sem-historico')
 
+  // O dia e o dono saem do próprio status, que já veio do banco: é o mesmo
+  // dia local que o agendador usa para escolher a frase da notificação — e é
+  // isso que faz as duas concordarem sem se falarem.
+  const fraseDoDia = escolherFrase(plantas[0].status.hoje, plantas[0].status.user_id)
+
   const secoes: [string, PlantaComStatus[]][] = [
     ['Precisam de você', precisamDeVoce],
     ['Próximos dias', proximas],
@@ -220,6 +227,8 @@ export function Hoje() {
           </section>
         ),
       )}
+
+      <FraseDoDia frase={fraseDoDia} />
     </>
   )
 }

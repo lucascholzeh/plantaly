@@ -53,6 +53,12 @@ interface CargaDeLembrete {
   titulo: string
   corpo: string
   url: string
+  /**
+   * Agrupa a notificação na tela. Duas notificações chegam na mesma manhã —
+   * a da rega e a da frase — e notificação nova com a mesma tag SUBSTITUI a
+   * anterior. Sem tags distintas a frase apagaria o lembrete de rega.
+   */
+  tag?: string
 }
 
 self.addEventListener('push', (evento) => {
@@ -73,8 +79,10 @@ self.addEventListener('push', (evento) => {
       icon: '/icone-192.png',
       badge: '/icone-192.png',
       data: { url: carga.url },
-      // Uma notificação por dia substitui a anterior em vez de empilhar.
-      tag: 'plantaly-lembrete',
+      // A tag vem do servidor: cada assunto tem a sua, para o lembrete de
+      // hoje substituir o de ontem sem que a frase substitua a rega. O
+      // padrão cobre a carga ilegível do `catch` acima.
+      tag: carga.tag ?? 'plantaly-lembrete',
       renotify: true,
     } as NotificationOptions),
   )

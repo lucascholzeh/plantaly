@@ -9,10 +9,12 @@ import {
   EstadoVazio,
   Etiqueta,
   FotoDaPlanta,
+  FraseDoDia,
   Motivo,
   Seletor,
 } from './componentes'
 import { estados } from './tokens'
+import { FRASES } from '../frases/frases'
 
 /**
  * Galeria do sistema visual.
@@ -99,6 +101,13 @@ export function Galeria() {
               <FotoDaPlanta caminho={null} apelido="🌵 cacto" tamanho="ficha" />
             </div>
           </Cartao>
+        </Secao>
+
+        <Secao titulo="Frase do dia">
+          {/* A mais longa e a mais curta juntas: é onde a caixa quebra, se
+              quebrar. */}
+          <FraseDoDia frase={[...FRASES].sort((a, b) => b.texto.length - a.texto.length)[0]} />
+          <FraseDoDia frase={[...FRASES].sort((a, b) => a.texto.length - b.texto.length)[0]} />
         </Secao>
 
         <Secao titulo="Superfícies">

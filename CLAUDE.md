@@ -15,7 +15,15 @@ App web mobile-first para cuidado de plantas de casa, com foco em flores.
 
 **Próxima rega no balão: sempre em dias, nunca em data.** `proximaRegaEmLinha` já mostrou "Regar 7 de outubro" e o Lucas recusou em 2026-08-30 — a data obriga a abrir o calendário para descobrir se é longe. Só "hoje" e "amanhã" escapam da contagem, por serem mais curtos que ela. A data por extenso continua na ficha da planta.
 
-**Pendente:** instalar o PWA nos dois iPhones e ativar os lembretes — único passo que exige aparelho real. Migrações 0001-0007 aplicadas; segredos enviados; Edge Function `enviar-lembretes` ACTIVE e respondendo 200.
+**Frase do dia (2026-08-30).** Frases existencialistas de livro, uma por manhã, no box abaixo das pendências da aba "Hoje" e em notificação própria. **São duas notificações por manhã agora:** a da rega — que passou a ser enviada também em dia calmo, dizendo que não há o que regar — e a da frase. **A escolha da frase é determinística** (`src/frases/escolha.ts`): sai de um hash do dia local + id do usuário, sem tabela nem estado, e é isso que faz o box e a notificação mostrarem a mesma frase sem se falarem. Migração 0009 **ainda não aplicada**.
+
+**Ao acrescentar frase:** confira a atribuição numa fonte antes de escrever, e preencha `fonte` com a URL — mesma disciplina do catálogo. O cabeçalho de `src/frases/frases.ts` registra duas atribuições que já foram **reprovadas** na conferência; não as reintroduza. Cuidado especial com a frase famosa que "todo mundo sabe de quem é": "quem tem um porquê enfrenta qualquer como" é de Nietzsche, não de Frankl, e a mais citada de Marco Aurélio na internet não existe nas Meditações.
+
+**As frases vivem em dois lugares** — `src/frases/` (navegador) e `supabase/functions/enviar-lembretes/` (Deno, que não alcança `src/`). São cópias literais, e `testes/frases-paridade.test.ts` falha se divergirem. **Ao mexer num, copie para o outro** — inclusive depois de `npm run format`, que reformata os dois e desfaz a igualdade byte a byte.
+
+**Tag da notificação vem do servidor.** Notificação nova com a mesma `tag` substitui a anterior na tela: com as duas da manhã usando `plantaly-lembrete`, a frase apagaria o lembrete de rega. `plantaly-rega` e `plantaly-frase` mantêm as duas visíveis.
+
+**Pendente:** aplicar a migração 0009 (`npm run migracoes:juntar 0009`), republicar a Edge Function, e instalar o PWA nos dois iPhones para ativar os lembretes — único passo que exige aparelho real. Migrações 0001-0008 aplicadas; segredos enviados; Edge Function `enviar-lembretes` ACTIVE e respondendo 200.
 
 Etapa 0: andaime Vite + React 19 + TypeScript, oxlint, Prettier, Vitest, cliente Supabase, autenticação por e-mail, migrações em `supabase/migrations/`, teste de isolamento em `testes/isolamento.test.ts`.
 

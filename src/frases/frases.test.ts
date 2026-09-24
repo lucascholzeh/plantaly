@@ -37,10 +37,31 @@ describe('integridade das frases', () => {
     const tudo = FRASES.map((f) => f.texto.toLowerCase()).join(' ')
     expect(tudo).not.toContain('qualidade dos teus pensamentos')
 
-    const frankl = FRASES.find((f) => f.texto.includes('porquê'))
-    expect(frankl?.autor, 'a frase do porquê é de Nietzsche, não de Frankl').toBe(
-      'Friedrich Nietzsche',
-    )
+    // A frase do porquê saiu na onda 2; se voltar, volta com o autor certo.
+    for (const frase of FRASES.filter((f) => f.texto.includes('porquê'))) {
+      expect(frase.autor, 'a frase do porquê é de Nietzsche, não de Frankl').toBe(
+        'Friedrich Nietzsche',
+      )
+    }
+
+    expect(tudo, 'listada em "Disputed" no Wikiquote').not.toContain('mundo sem liberdade')
+  })
+
+  it('não traz de volta as frases aposentadas na onda 2', () => {
+    // O Lucas pediu para tirar as da primeira lista: "já foram".
+    const aposentadas = [
+      'camus-sisifo-feliz',
+      'camus-luta-cume',
+      'kierkegaard-para-tras',
+      'nietzsche-porque-como',
+      'nietzsche-amor-fati',
+      'sartre-faz-de-si',
+      'marco-aurelio-trabalho-humano',
+      'rilke-paciencia-coracao',
+      'clarice-perguntas',
+    ]
+    const nomes = FRASES.map((f) => f.nome)
+    for (const nome of aposentadas) expect(nomes, nome).not.toContain(nome)
   })
 })
 

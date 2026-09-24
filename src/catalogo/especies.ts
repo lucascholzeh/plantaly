@@ -719,7 +719,7 @@ export const ESPECIES: Especie[] = [
 
     criterioDeRega:
       'Depende de como ela vive. Na água, o cuidado não é regar e sim TROCAR a água toda ' +
-      'semana, mantendo o nível cobrindo as raízes e uns três centímetros da haste. No ' +
+      'semana, mantendo o nível cobrindo as raízes e ao menos 2,5 cm da haste. No ' +
       'substrato, regue quando o primeiro centímetro estiver seco ao dedo.',
     regaQuente: [7, 7],
     regaFria: [7, 10],
@@ -781,7 +781,7 @@ export const ESPECIES: Especie[] = [
       },
     ],
     cuidadoEspecifico: [
-      'Na água, o nível precisa cobrir as raízes e ao menos três centímetros da haste — abaixo ' +
+      'Na água, o nível precisa cobrir as raízes e ao menos 2,5 cm da haste — abaixo ' +
         'disso ela desidrata mesmo dentro do copo.',
       'Deixe a água de torneira descansar 24 horas antes de usar: o cloro evapora e a folha para ' +
         'de queimar na ponta.',

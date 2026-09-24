@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { comoRegar } from '../catalogo/comoRegar'
 import { apagarEvento, existeNoDia, registrarEvento } from '../dados/eventos'
 import { listarPlantas } from '../dados/plantas'
 import type { PlantaComStatus } from '../dados/tipos'
@@ -312,6 +313,11 @@ function ItemDeHoje({
             diferencaEmDias(status.hoje, status.proxima_rega),
           )}
         </p>
+      )}
+      {/* Quem precisa de água ganha o gesto no lugar da próxima rega: é a
+          dúvida da hora de pegar o regador. O detalhe fica na ficha. */}
+      {status.situacao_rega !== 'em-dia' && (
+        <p className="item__proxima">{comoRegar(planta.species_slug).rega.resumo}</p>
       )}
       <Botao onClick={aoRegar} disabled={ocupado}>
         {ocupado ? 'Salvando…' : 'Reguei'}

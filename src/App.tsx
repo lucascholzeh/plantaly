@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect } from 'react'
 import { TelaAutenticacao } from './auth/TelaAutenticacao'
 import { useSessao } from './auth/useSessao'
 import { BarraNavegacao } from './navegacao/BarraNavegacao'
 import { ConviteInstalacao } from './pwa/ConviteInstalacao'
+import { reconciliarInscricao } from './pwa/push'
 import { TITULOS } from './navegacao/abas'
 import { abaDaRota, useRota, voltar, type Rota } from './navegacao/rotas'
 import { Ajustes } from './telas/Ajustes'
@@ -56,6 +58,25 @@ function chaveDe(rota: Rota): string {
 export default function App() {
   const { sessao, carregando } = useSessao()
   const rota = useRota()
+  const usuario = sessao?.user.id
+
+  // Confere a inscrição de push a cada abertura. "Abertura" inclui voltar do
+  // segundo plano: no iPhone o app da Tela de Início quase nunca é relançado
+  // do zero, só retomado — contar só a montagem deixaria dias sem conferir.
+  useEffect(() => {
+    if (!usuario) return
+    const conferir = () => {
+      // Falha aqui não tem o que mostrar: a tela de Ajustes e o convite
+      // consultam o estado por conta própria.
+      reconciliarInscricao().catch(() => {})
+    }
+    conferir()
+    const aoVoltar = () => {
+      if (document.visibilityState === 'visible') conferir()
+    }
+    document.addEventListener('visibilitychange', aoVoltar)
+    return () => document.removeEventListener('visibilitychange', aoVoltar)
+  }, [usuario])
 
   if (carregando) return null
   if (!sessao) return <TelaAutenticacao />

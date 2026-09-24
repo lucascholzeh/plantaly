@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Botao, Cartao } from '../visual/componentes'
-import { ativarPush, estadoDoPush, type EstadoDoPush } from './push'
-
-const CHAVE = 'plantaly:convite-push-dispensado'
+import {
+  ativarPush,
+  CHAVE_CONVITE_DISPENSADO as CHAVE,
+  estadoDoPush,
+  type EstadoDoPush,
+} from './push'
 
 /**
  * Convite para ligar os lembretes.
@@ -24,7 +27,17 @@ export function ConvitePush() {
 
   useEffect(() => {
     estadoDoPush()
-      .then(setEstado)
+      .then((novo) => {
+        setEstado(novo)
+        // Relido aqui porque `estadoDoPush` espera a reconciliação da
+        // abertura, e ela esquece o "Agora não" quando a inscrição morreu e
+        // não pôde ser refeita sozinha.
+        try {
+          setDispensado(window.localStorage.getItem(CHAVE) === 'sim')
+        } catch {
+          // Sem armazenamento, fica o valor lido na montagem.
+        }
+      })
       .catch(() => setEstado('indisponivel'))
   }, [])
 

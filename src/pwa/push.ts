@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import { estaInstalado } from './instalacao'
+import { decidirReconciliacao } from './reconciliacao'
 
 /**
  * Inscrição de push.
@@ -36,31 +37,80 @@ export type EstadoDoPush =
   | 'desativado'
   | 'ativo'
 
+/**
+ * Chave do "Agora não" do convite. Mora aqui, e não no convite, porque a
+ * reconciliação também precisa apagá-la — ver `reconciliarInscricao`.
+ */
+export const CHAVE_CONVITE_DISPENSADO = 'plantaly:convite-push-dispensado'
+
+function suportaPush(): boolean {
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+}
+
+/**
+ * `serviceWorker.ready` nunca rejeita: se nenhum worker assumir o controle,
+ * ela fica pendurada para sempre e a tela trava em "Verificando…". O limite
+ * transforma esse silêncio numa resposta.
+ */
+function registroComLimite(): Promise<ServiceWorkerRegistration | null> {
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+  ])
+}
+
+/** Reconciliação da abertura, enquanto não termina. Ver `estadoDoPush`. */
+let reconciliacaoEmCurso: Promise<void> | null = null
+
 export async function estadoDoPush(): Promise<EstadoDoPush> {
-  if (
-    !('serviceWorker' in navigator) ||
-    !('PushManager' in window) ||
-    !('Notification' in window)
-  ) {
-    return 'indisponivel'
-  }
+  if (!suportaPush()) return 'indisponivel'
   // No iOS a API existe mas falha fora da Tela de Início. Melhor dizer o que
   // falta do que deixar a pessoa tocar num botão que não funciona.
   if (!estaInstalado()) return 'precisa-instalar'
   if (!CHAVE_PUBLICA) return 'sem-chave'
   if (Notification.permission === 'denied') return 'negado'
 
-  // `serviceWorker.ready` nunca rejeita: se nenhum worker assumir o controle,
-  // ela fica pendurada para sempre e a tela trava em "Verificando…". O limite
-  // transforma esse silêncio numa resposta.
-  const registro = await Promise.race([
-    navigator.serviceWorker.ready,
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
-  ])
+  // A reconciliação da abertura pode estar trocando a inscrição agora mesmo.
+  // Ler antes dela terminar mostraria "ativo" para uma inscrição que está
+  // prestes a ser descartada.
+  if (reconciliacaoEmCurso) await reconciliacaoEmCurso
+
+  const registro = await registroComLimite()
   if (!registro) return 'sem-worker'
 
   const assinatura = await registro.pushManager.getSubscription()
   return assinatura ? 'ativo' : 'desativado'
+}
+
+/**
+ * Grava a inscrição do aparelho no banco.
+ *
+ * `endpoint` é único: reinscrever o mesmo aparelho atualiza em vez de
+ * duplicar, e uma pessoa com iPhone e iPad tem duas linhas legítimas.
+ */
+async function gravarInscricao(assinatura: PushSubscription): Promise<void> {
+  const dados = assinatura.toJSON()
+  const { data: sessao } = await supabase.auth.getUser()
+  if (!sessao.user) throw new Error('Sem sessão ativa')
+
+  const { error } = await supabase.from('push_subscriptions').upsert(
+    {
+      user_id: sessao.user.id,
+      endpoint: assinatura.endpoint,
+      p256dh: dados.keys!.p256dh,
+      auth_key: dados.keys!.auth,
+      failure_count: 0,
+    },
+    { onConflict: 'endpoint' },
+  )
+  if (error) throw new Error(`Não consegui salvar a inscrição: ${error.message}`)
+}
+
+function inscrever(registro: ServiceWorkerRegistration): Promise<PushSubscription> {
+  return registro.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: paraBytes(CHAVE_PUBLICA!),
+  })
 }
 
 /**
@@ -77,29 +127,7 @@ export async function ativarPush(): Promise<EstadoDoPush> {
   if (permissao !== 'granted') return permissao === 'denied' ? 'negado' : 'desativado'
 
   const registro = await navigator.serviceWorker.ready
-  const assinatura = await registro.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: paraBytes(CHAVE_PUBLICA),
-  })
-
-  const dados = assinatura.toJSON()
-  const { data: sessao } = await supabase.auth.getUser()
-  if (!sessao.user) throw new Error('Sem sessão ativa')
-
-  // `endpoint` é único: reinscrever o mesmo aparelho atualiza em vez de
-  // duplicar, e uma pessoa com iPhone e iPad tem duas linhas legítimas.
-  const { error } = await supabase.from('push_subscriptions').upsert(
-    {
-      user_id: sessao.user.id,
-      endpoint: assinatura.endpoint,
-      p256dh: dados.keys!.p256dh,
-      auth_key: dados.keys!.auth,
-      failure_count: 0,
-    },
-    { onConflict: 'endpoint' },
-  )
-  if (error) throw new Error(`Não consegui salvar a inscrição: ${error.message}`)
-
+  await gravarInscricao(await inscrever(registro))
   return 'ativo'
 }
 
@@ -113,22 +141,60 @@ export async function desativarPush(): Promise<void> {
 }
 
 /**
- * Reconcilia o que o navegador tem com o que o banco tem.
+ * Reconcilia o que o aparelho tem com o que o banco tem. Roda a cada
+ * abertura do app — ver `App.tsx`.
  *
- * Inscrição pode morrer sem avisar — o ícone foi apagado, o aparelho trocou.
- * Quando isso acontece o servidor remove a linha, e aqui o app percebe na
- * abertura seguinte e reoferece.
+ * Inscrição pode morrer sem avisar: a Apple responde 404/410, a Edge Function
+ * apaga a linha, e o aparelho continua guardando a inscrição morta. Antes
+ * desta função o app seguia mostrando "ativo" e a pessoa simplesmente parava
+ * de receber — foi o que aconteceu com uma das contas em setembro de 2026.
+ *
+ * Aqui a inscrição morta é descartada e uma nova é criada e gravada, sem
+ * pedir nada a ninguém. Se o iPhone recusar criar a nova fora de um toque, o
+ * "Agora não" do convite é esquecido: a pessoa já tinha escolhido receber, e
+ * o convite na aba "Hoje" é o jeito de ela religar com um toque.
  */
-export async function inscricaoRegistrada(): Promise<boolean> {
-  const registro = await navigator.serviceWorker.ready
-  const assinatura = await registro.pushManager.getSubscription()
-  if (!assinatura) return false
+export function reconciliarInscricao(): Promise<void> {
+  reconciliacaoEmCurso ??= reconciliar().finally(() => {
+    reconciliacaoEmCurso = null
+  })
+  return reconciliacaoEmCurso
+}
 
-  const { data } = await supabase
-    .from('push_subscriptions')
-    .select('id')
-    .eq('endpoint', assinatura.endpoint)
-    .maybeSingle()
+async function reconciliar(): Promise<void> {
+  if (!suportaPush() || !estaInstalado() || !CHAVE_PUBLICA) return
 
-  return data !== null
+  const registro = await registroComLimite()
+  if (!registro) return
+  const antiga = await registro.pushManager.getSubscription()
+
+  let temNoBanco: boolean | null = null
+  if (antiga) {
+    const { data, error } = await supabase
+      .from('push_subscriptions')
+      .select('id')
+      .eq('endpoint', antiga.endpoint)
+      .maybeSingle()
+    temNoBanco = error ? null : data !== null
+  }
+
+  const decisao = decidirReconciliacao({
+    permissao: Notification.permission,
+    temNoAparelho: antiga !== null,
+    temNoBanco,
+  })
+  if (decisao === 'nada' || !antiga) return
+
+  // Descartar antes de criar: com a antiga ainda presa ao worker, o
+  // `subscribe` devolveria o mesmo endpoint morto.
+  await antiga.unsubscribe()
+  try {
+    await gravarInscricao(await inscrever(registro))
+  } catch {
+    try {
+      window.localStorage.removeItem(CHAVE_CONVITE_DISPENSADO)
+    } catch {
+      // Sem armazenamento o convite já aparece de qualquer jeito.
+    }
+  }
 }

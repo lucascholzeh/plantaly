@@ -67,8 +67,8 @@ export function ConvitePush() {
     <Cartao elevado className="convite">
       <h2 className="lista__titulo">Quer ser lembrado?</h2>
       <p className="formulario__nota">
-        Uma notificação por dia, no horário que você escolher, e só quando houver planta precisando.
-        Nada vencendo, nada de aviso.
+        Toda manhã, no horário que você escolher: um aviso com o que precisa de água — ou dizendo
+        que hoje não há nada — e a frase do dia.
       </p>
       <div className="acoes">
         <Botao onClick={ligar} disabled={ocupado}>

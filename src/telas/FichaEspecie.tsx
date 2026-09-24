@@ -1,6 +1,7 @@
 import { buscarEspecie, formatarFaixa, urlDaFoto } from '../catalogo'
 import { irPara } from '../navegacao/rotas'
 import { Aviso, Botao, Cartao } from '../visual/componentes'
+import { BlocoComoRegar } from './BlocoComoRegar'
 
 /**
  * Ficha completa de uma espécie.
@@ -57,6 +58,9 @@ export function FichaEspecie({ slug }: { slug: string }) {
         <h2 className="lista__titulo">Como saber que chegou a hora</h2>
         <p>{especie.criterioDeRega}</p>
       </Cartao>
+
+      {/* Logo depois do "quando": a ordem da ficha é a ordem da dúvida. */}
+      <BlocoComoRegar especieSlug={especie.slug} />
 
       <Cartao>
         <h2 className="lista__titulo">Rega</h2>

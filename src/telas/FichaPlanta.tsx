@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BlocoAdubacao } from './BlocoAdubacao'
 import { BlocoAprendizado } from './BlocoAprendizado'
+import { BlocoComoRegar } from './BlocoComoRegar'
 import { BlocoEdicao } from './BlocoEdicao'
 import { BlocoFloracao } from './BlocoFloracao'
 import { BlocoFoto } from './BlocoFoto'
@@ -136,6 +137,8 @@ export function FichaPlanta({ id }: { id: string }) {
           {salvando ? 'Salvando…' : 'Reguei hoje'}
         </Botao>
       </Cartao>
+
+      <BlocoComoRegar especieSlug={p.species_slug} emAtencao={status.situacao_rega === 'atencao'} />
 
       <BlocoFoto planta={p} aoMudar={recarregarTudo} />
 

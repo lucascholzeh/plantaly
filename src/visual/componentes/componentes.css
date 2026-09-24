@@ -339,6 +339,37 @@
   color: var(--estado-atencao-forte);
 }
 
+/* ------------------------------------------------------------ como regar */
+
+.como-regar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-sm);
+}
+
+.como-regar p {
+  margin: 0;
+}
+
+.como-regar__passos {
+  margin: 0;
+  padding-left: var(--espaco-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xs);
+}
+
+.como-regar__subtitulo {
+  margin: var(--espaco-xs) 0 0;
+  font-size: var(--texto-sm);
+}
+
+.como-regar__fontes {
+  margin: var(--espaco-xs) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* --------------------------------------------------------------- floração */
 
 .floracao__lista {

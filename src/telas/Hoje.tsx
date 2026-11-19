@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { comoRegar } from '../catalogo/comoRegar'
 import { apagarEvento, existeNoDia, registrarEvento } from '../dados/eventos'
-import { listarFrases } from '../dados/frases'
 import { listarPlantas } from '../dados/plantas'
 import type { PlantaComStatus } from '../dados/tipos'
 import { useCarregamento } from '../dados/useCarregamento'
@@ -39,10 +38,6 @@ interface Desfazivel {
 export function Hoje() {
   const { dados, carregando, erro, recarregar } = useCarregamento(listarPlantas)
   const fotos = useFotosAssinadas(dados)
-  // Carregamento à parte e sem erro na tela: a frase é o fim da leitura, não
-  // o motivo de abrir o app. Se as frases não vierem, o box simplesmente não
-  // aparece — as pendências de rega continuam todas ali (princípio 4).
-  const { dados: frases } = useCarregamento(listarFrases)
   const [desfazivel, setDesfazivel] = useState<Desfazivel | null>(null)
   const [falha, setFalha] = useState<string | null>(null)
   const [ocupada, setOcupada] = useState<string | null>(null)
@@ -152,12 +147,8 @@ export function Hoje() {
 
   // O dia e o dono saem do próprio status, que já veio do banco: é o mesmo
   // dia local que o agendador usa para escolher a frase da notificação — e é
-  // isso que faz as duas concordarem sem se falarem. A lista vem da mesma
-  // tabela que a Edge Function lê.
-  const fraseDoDia =
-    frases && frases.length > 0
-      ? escolherFrase(plantas[0].status.hoje, plantas[0].status.user_id, frases)
-      : null
+  // isso que faz as duas concordarem sem se falarem.
+  const fraseDoDia = escolherFrase(plantas[0].status.hoje, plantas[0].status.user_id)
 
   const secoes: [string, PlantaComStatus[]][] = [
     ['Precisam de você', precisamDeVoce],
@@ -238,7 +229,7 @@ export function Hoje() {
         ),
       )}
 
-      {fraseDoDia && <FraseDoDia frase={fraseDoDia} />}
+      <FraseDoDia frase={fraseDoDia} />
     </>
   )
 }

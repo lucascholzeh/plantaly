@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-import { escolherFrase, hashEstavel, type Frase } from '../src/frases/escolha'
+import { FRASES } from '../src/frases/frases'
+import { escolherFrase, hashEstavel } from '../src/frases/escolha'
+import { FRASES as FRASES_FUNCAO } from '../supabase/functions/enviar-lembretes/frases.ts'
 import {
   escolherFrase as escolherNaFuncao,
   hashEstavel as hashNaFuncao,
@@ -10,27 +12,35 @@ import {
 /**
  * A frase do app e a frase da notificação são a mesma.
  *
- * As frases em si moram na tabela `frases` (migração 0010), e os dois lados
- * leem a mesma tabela. O que continua em dois lugares é o **cálculo**: o
+ * O código vive em dois lugares porque precisa rodar em dois runtimes: o
  * navegador importa de `src/frases/`, e o Deno da Edge Function não alcança
  * `src/` — daí a cópia em `supabase/functions/enviar-lembretes/`.
  *
- * Cópia sem teste apodrece: alguém muda a rotação de um lado, e a
- * notificação passa a citar uma frase enquanto o box mostra outra. É o
- * princípio 3 do projeto — nada calculado em dois lugares sem paridade.
+ * Cópia sem teste apodrece: alguém acrescenta uma frase de um lado, e a
+ * notificação passa a citar uma coisa enquanto o box mostra outra. É o
+ * mesmo raciocínio do princípio 3 do projeto — nada calculado em dois
+ * lugares sem teste de paridade.
  *
- * **Ao mexer em `escolha.ts`, copie para o outro lado** — inclusive depois de
- * `npm run format`.
+ * **Ao mexer em qualquer um dos dois arquivos, copie para o outro.**
  */
-const CARGA: Frase[] = JSON.parse(
-  readFileSync('supabase/migrations/0010_frases_no_banco.sql', 'utf8').split('$frases$')[1],
-)
+describe('paridade entre as frases do app e as da Edge Function', () => {
+  it('os arquivos de frases são idênticos', () => {
+    const noApp = readFileSync('src/frases/frases.ts', 'utf8')
+    const naFuncao = readFileSync('supabase/functions/enviar-lembretes/frases.ts', 'utf8')
+    expect(naFuncao).toBe(noApp)
+  })
 
-describe('paridade da escolha da frase entre o app e a Edge Function', () => {
-  it('os arquivos de escolha são idênticos', () => {
+  it('os arquivos de escolha só diferem na extensão do import', () => {
     const noApp = readFileSync('src/frases/escolha.ts', 'utf8')
     const naFuncao = readFileSync('supabase/functions/enviar-lembretes/escolha.ts', 'utf8')
-    expect(naFuncao).toBe(noApp)
+    // O Deno exige a extensão no import; o resto tem de bater caractere a
+    // caractere.
+    expect(naFuncao.replace("'./frases.ts'", "'./frases'")).toBe(noApp)
+  })
+
+  it('as duas listas têm as mesmas frases', () => {
+    expect(FRASES_FUNCAO.map((f) => f.nome)).toEqual(FRASES.map((f) => f.nome))
+    expect(FRASES_FUNCAO.map((f) => f.texto)).toEqual(FRASES.map((f) => f.texto))
   })
 
   it('os dois hashes concordam', () => {
@@ -41,16 +51,13 @@ describe('paridade da escolha da frase entre o app e a Edge Function', () => {
 
   it('os dois lados escolhem a mesma frase para o mesmo dia e usuário', () => {
     // A propriedade que o usuário percebe: abrir o app depois de ler a
-    // notificação mostra a mesma frase. Cada lado recebe as linhas numa
-    // ordem diferente, como pode acontecer vindo do banco.
-    const paraOApp = CARGA
-    const paraAFuncao = [...CARGA].reverse()
+    // notificação mostra a mesma frase.
     const usuarios = ['11111111-1111-1111-1111-111111111111', 'abc-def', '']
     for (const usuario of usuarios) {
       for (let d = 1; d <= 31; d++) {
         const dia = `2026-10-${String(d).padStart(2, '0')}`
-        expect(escolherNaFuncao(dia, usuario, paraAFuncao).nome, `${dia} / ${usuario}`).toBe(
-          escolherFrase(dia, usuario, paraOApp).nome,
+        expect(escolherNaFuncao(dia, usuario).nome, `${dia} / ${usuario}`).toBe(
+          escolherFrase(dia, usuario).nome,
         )
       }
     }

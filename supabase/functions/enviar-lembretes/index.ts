@@ -12,9 +12,8 @@
  * 1. **A da rega.** Com pendência, uma das 40 variações; sem pendência, uma
  *    das variações calmas ("nada para regar hoje"). Ao contrário de antes,
  *    dia calmo agora também notifica.
- * 2. **A da frase.** Uma frase de livro, a mesma que o box da aba "Hoje"
- *    mostra naquele dia — ver `escolha.ts`. As frases vêm da tabela
- *    `frases` (migração 0010), lida uma vez por execução.
+ * 2. **A da frase.** Uma frase existencialista de livro, a mesma que o box
+ *    da aba "Hoje" mostra naquele dia — ver `escolha.ts`.
  *
  * As duas levam `tag` diferente. Com a mesma tag a segunda substituiria a
  * primeira na tela do iPhone, e só uma seria lida.
@@ -22,7 +21,7 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
 import { montarMensagem, montarMensagemCalma, type Pendencia } from './variacoes.ts'
-import { escolherFrase, type Frase } from './escolha.ts'
+import { escolherFrase } from './escolha.ts'
 
 const URL_SUPABASE = Deno.env.get('SUPABASE_URL')!
 const CHAVE_SERVICO = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -156,16 +155,6 @@ Deno.serve(async (requisicao) => {
     removidos: 0,
   }
 
-  // Uma leitura por execução, e só se houver alguém na hora — a maioria das
-  // 24 execuções do dia não tem ninguém. Falha aqui não pode impedir o
-  // lembrete de rega: sem frases, cada pessoa recebe só a notificação da rega.
-  let frases: Frase[] = []
-  if (naHora.length > 0) {
-    const { data, error } = await supabase.from('frases').select('nome, texto, autor, obra')
-    if (error) console.error('frases indisponíveis:', error.message)
-    frases = data ?? []
-  }
-
   for (const perfil of naHora) {
     const { data: status } = await supabase
       .from('plant_status')
@@ -223,7 +212,6 @@ Deno.serve(async (requisicao) => {
     }
 
     // --------------------------------------------------- 2. a da frase
-    if (frases.length === 0) continue
     // Nada é gravado aqui: a escolha é determinística a partir do dia e do
     // id, e é exatamente isso que faz o box do app mostrar esta mesma
     // frase. Ver `escolha.ts`.
@@ -235,7 +223,7 @@ Deno.serve(async (requisicao) => {
       // frase não pode derrubar o envio dos outros.
       continue
     }
-    const frase = escolherFrase(dia, perfil.id, frases)
+    const frase = escolherFrase(dia, perfil.id)
     await enviarPara(
       inscricoes,
       { titulo: 'Frase do dia', corpo: `"${frase.texto}" — ${frase.autor}` },

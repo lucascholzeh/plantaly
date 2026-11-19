@@ -1,17 +1,4 @@
-/**
- * Uma frase da manhã, como vem da tabela `frases` (migração 0010).
- *
- * Mora aqui, e não num arquivo de tipos à parte, porque este arquivo é
- * copiado literalmente para a Edge Function: o Deno não alcança `src/`, e
- * um import a mais seria mais uma cópia para manter em paridade.
- */
-export interface Frase {
-  /** Identidade estável — e a chave da ordem da rotação. */
-  nome: string
-  texto: string
-  autor: string
-  obra: string
-}
+import { FRASES, type Frase } from './frases'
 
 /**
  * Qual frase é a de hoje.
@@ -41,13 +28,6 @@ export interface Frase {
  * recebam a mesma frase na mesma manhã — o que seria notado, sendo duas
  * pessoas na mesma cozinha. Com ordens independentes, coincidem em cerca de
  * um dia a cada `lista.length`.
- *
- * **A lista vem do banco (2026-11-19)** e chega na ordem que o banco quiser.
- * Por isso a escolha ordena pelo `nome` antes de embaralhar: o app e a
- * função podem pedir as linhas sem `order by`, ou com ordens diferentes, e
- * mesmo assim concordam. A comparação é por código de caractere, não
- * `localeCompare` — a ordem por idioma depende do runtime, e o Deno e o
- * Safari do iPhone não têm obrigação de concordar sobre ela.
  *
  * **Mudar a lista reembaralha tudo uma vez.** A ordem depende do tamanho da
  * lista; acrescentar ou tirar frase dá a cada pessoa uma ordem nova, e no dia
@@ -124,11 +104,10 @@ export function numeroDoDia(dia: string): number {
  * pessoa, como todo o resto do cálculo do app. Usar um instante UTC aqui
  * faria a frase virar de madrugada para quem estivesse a leste.
  */
-export function escolherFrase<T extends Frase>(dia: string, usuarioId: string, lista: T[]): T {
+export function escolherFrase(dia: string, usuarioId: string, lista: Frase[] = FRASES): Frase {
   if (lista.length === 0) throw new Error('Lista de frases vazia')
-  const ordenada = [...lista].sort((a, b) => (a.nome < b.nome ? -1 : a.nome > b.nome ? 1 : 0))
-  const ordem = ordemDoUsuario(usuarioId, ordenada.length)
+  const ordem = ordemDoUsuario(usuarioId, lista.length)
   // Módulo que não fica negativo: dias antes de 2026 continuam válidos.
-  const posicao = ((numeroDoDia(dia) % ordenada.length) + ordenada.length) % ordenada.length
-  return ordenada[ordem[posicao]]
+  const posicao = ((numeroDoDia(dia) % lista.length) + lista.length) % lista.length
+  return lista[ordem[posicao]]
 }

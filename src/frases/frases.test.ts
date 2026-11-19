@@ -3,13 +3,18 @@ import { FRASES } from './frases'
 import { escolherFrase, hashEstavel, numeroDoDia } from './escolha'
 
 describe('integridade das frases', () => {
+  it('são 100 frases', () => {
+    // O pedido do Lucas na onda 3, em 2026-11-19.
+    expect(FRASES).toHaveLength(100)
+  })
+
   it('toda frase tem texto, autor, obra e fonte', () => {
     for (const frase of FRASES) {
       expect(frase.texto.length, frase.nome).toBeGreaterThan(0)
       expect(frase.autor.length, frase.nome).toBeGreaterThan(0)
       expect(frase.obra.length, frase.nome).toBeGreaterThan(0)
       // A fonte é o que separa "citação conferida" de "citação lembrada".
-      expect(frase.fonte, frase.nome).toMatch(/^https:\/\//)
+      expect(frase.fonte, frase.nome).toMatch(/^https:\/\/(en|pt)\.wikiquote\.org\/wiki\//)
     }
   })
 
@@ -45,11 +50,28 @@ describe('integridade das frases', () => {
     }
 
     expect(tudo, 'listada em "Disputed" no Wikiquote').not.toContain('mundo sem liberdade')
+
+    // Onda 3: frases "conhecidas" que não estão em nenhuma entrada com fonte
+    // do Wikiquote. Ver o cabeçalho de `frases.ts`.
+    expect(tudo).not.toContain('aprender a voar')
+    expect(tudo).not.toContain('vontade de caminhar')
+    expect(tudo).not.toContain('outro lado do desespero')
+    expect(tudo).not.toContain('nenhum sentimento é definitivo')
   })
 
-  it('não traz de volta as frases aposentadas na onda 2', () => {
-    // O Lucas pediu para tirar as da primeira lista: "já foram".
-    const aposentadas = [
+  it('autor de língua portuguesa vai no original, sem tradução', () => {
+    const lusofonos = ['Pessoa', 'Drummond', 'Cecília', 'Clarice', 'Guimarães Rosa', 'Saramago']
+    for (const frase of FRASES.filter((f) => lusofonos.some((a) => f.autor.includes(a)))) {
+      expect(frase.traducaoVariavel, frase.nome).toBeFalsy()
+    }
+  })
+
+  it('não traz de volta as frases aposentadas', () => {
+    // Onda 1, aposentadas em 2026-09-24 — "já foram", disse o Lucas. Duas
+    // delas (o amanhecer de Marco Aurélio e o "compreendida para trás" de
+    // Kierkegaard) foram reaprovadas na amostra da onda 3 e ficaram de fora
+    // mesmo assim, por essa decisão anterior.
+    const onda1 = [
       'camus-sisifo-feliz',
       'camus-luta-cume',
       'kierkegaard-para-tras',
@@ -60,8 +82,61 @@ describe('integridade das frases', () => {
       'rilke-paciencia-coracao',
       'clarice-perguntas',
     ]
+    // Onda 2, aposentadas em 2026-11-19 na troca pelas 100.
+    const onda2 = [
+      'camus-verao-invencivel',
+      'camus-generosidade-presente',
+      'camus-longa-paciencia',
+      'camus-mais-a-admirar',
+      'camus-alma-determinada',
+      'sartre-sentido-a-priori',
+      'sartre-um-dia-recomecando',
+      'sartre-o-que-podem-ser',
+      'beauvoir-conhecer-a-si',
+      'beauvoir-valor-da-vida',
+      'kierkegaard-pressa-do-prazer',
+      'nietzsche-estrela-dancante',
+      'nietzsche-sem-musica',
+      'dostoievski-dor-antiga',
+      'dostoievski-contar-os-dias',
+      'dostoievski-algo-pelo-que-viver',
+      'kafka-homem-que-quer-viver',
+      'kafka-espinheiro',
+      'rilke-mudar-tua-vida',
+      'rilke-entrar-em-si',
+      'hesse-o-que-brotava-de-mim',
+      'hesse-misterio-da-vida',
+      'pessoa-vale-a-pena',
+      'pessoa-se-inteiro',
+      'pessoa-lavar-o-destino',
+      'pessoa-tamanho-do-que-vejo',
+      'pessoa-vivo-no-presente',
+      'seneca-comeca-ja',
+      'seneca-enquanto-adiamos',
+      'seneca-aprender-a-viver',
+      'seneca-desperdicamos-muito',
+      'epicteto-o-que-queres-ser',
+      'marco-aurelio-se-um',
+      'montaigne-pertencer-a-si',
+      'thoreau-dia-desperto',
+      'thoreau-caminhada-cedo',
+      'thoreau-viver-deliberadamente',
+      'emerson-saude-e-um-dia',
+      'emerson-dias-como-seculos',
+      'emerson-melhor-dia-do-ano',
+      'ortega-atencao',
+      'weil-atencao-generosidade',
+      'buber-vida-e-encontro',
+      'buber-saber-comecar',
+      'fromm-ato-de-viver',
+      'fromm-dar-a-luz-a-si',
+      'unamuno-habito',
+      'machado-caminhante',
+      'rosa-coragem',
+      'saramago-repara',
+    ]
     const nomes = FRASES.map((f) => f.nome)
-    for (const nome of aposentadas) expect(nomes, nome).not.toContain(nome)
+    for (const nome of [...onda1, ...onda2]) expect(nomes, nome).not.toContain(nome)
   })
 })
 

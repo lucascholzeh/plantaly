@@ -14,7 +14,24 @@ import {
   Seletor,
 } from './componentes'
 import { estados } from './tokens'
-import { FRASES } from '../frases/frases'
+import type { Frase } from '../frases/escolha'
+
+// As frases moram no banco desde a migração 0010; a galeria não fala com o
+// banco. Estas duas são a mais longa e a mais curta da carga inicial — é
+// onde a caixa quebra, se quebrar.
+const FRASE_LONGA: Frase = {
+  nome: 'thoreau-direcao-dos-sonhos',
+  texto:
+    'Se alguém avança confiante na direção dos seus sonhos, e se esforça para viver a vida que imaginou, encontrará um sucesso inesperado nas horas comuns.',
+  autor: 'Henry David Thoreau',
+  obra: 'Walden (1854), "Conclusão"',
+}
+const FRASE_CURTA: Frase = {
+  nome: 'montaigne-medo',
+  texto: 'O que mais temo é o medo.',
+  autor: 'Michel de Montaigne',
+  obra: 'Ensaios, I.18',
+}
 
 /**
  * Galeria do sistema visual.
@@ -104,10 +121,8 @@ export function Galeria() {
         </Secao>
 
         <Secao titulo="Frase do dia">
-          {/* A mais longa e a mais curta juntas: é onde a caixa quebra, se
-              quebrar. */}
-          <FraseDoDia frase={[...FRASES].sort((a, b) => b.texto.length - a.texto.length)[0]} />
-          <FraseDoDia frase={[...FRASES].sort((a, b) => a.texto.length - b.texto.length)[0]} />
+          <FraseDoDia frase={FRASE_LONGA} />
+          <FraseDoDia frase={FRASE_CURTA} />
         </Secao>
 
         <Secao titulo="Superfícies">

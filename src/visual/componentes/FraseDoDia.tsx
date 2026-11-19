@@ -1,4 +1,4 @@
-import type { Frase } from '../../frases/frases'
+import type { Frase } from '../../frases/escolha'
 
 interface Props {
   frase: Frase
